@@ -1,6 +1,15 @@
-import { eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import {
+  contactMessages,
+  creators,
+  InsertContactMessage,
+  InsertCreator,
+  InsertTrack,
+  tracks,
+  InsertUser,
+  users,
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +98,96 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+async function requireDb() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db;
+}
+
+/* ------------------------------ Tracks ------------------------------ */
+
+export async function listTracks() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(tracks).orderBy(asc(tracks.sortOrder), asc(tracks.id));
+}
+
+export async function createTrack(values: InsertTrack) {
+  const db = await requireDb();
+  const result = await db.insert(tracks).values(values).$returningId();
+  return result[0]?.id;
+}
+
+export async function updateTrack(id: number, values: Partial<InsertTrack>) {
+  const db = await requireDb();
+  await db.update(tracks).set(values).where(eq(tracks.id, id));
+}
+
+export async function deleteTrack(id: number) {
+  const db = await requireDb();
+  await db.delete(tracks).where(eq(tracks.id, id));
+}
+
+export async function getMaxTrackSortOrder() {
+  const db = await getDb();
+  if (!db) return 0;
+  const rows = await db
+    .select({ sortOrder: tracks.sortOrder })
+    .from(tracks)
+    .orderBy(desc(tracks.sortOrder))
+    .limit(1);
+  return rows[0]?.sortOrder ?? 0;
+}
+
+/* ----------------------------- Creators ----------------------------- */
+
+export async function listCreators() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(creators).orderBy(asc(creators.sortOrder), asc(creators.id));
+}
+
+export async function createCreator(values: InsertCreator) {
+  const db = await requireDb();
+  const result = await db.insert(creators).values(values).$returningId();
+  return result[0]?.id;
+}
+
+export async function updateCreator(id: number, values: Partial<InsertCreator>) {
+  const db = await requireDb();
+  await db.update(creators).set(values).where(eq(creators.id, id));
+}
+
+export async function deleteCreator(id: number) {
+  const db = await requireDb();
+  await db.delete(creators).where(eq(creators.id, id));
+}
+
+export async function getMaxCreatorSortOrder() {
+  const db = await getDb();
+  if (!db) return 0;
+  const rows = await db
+    .select({ sortOrder: creators.sortOrder })
+    .from(creators)
+    .orderBy(desc(creators.sortOrder))
+    .limit(1);
+  return rows[0]?.sortOrder ?? 0;
+}
+
+/* ------------------------- Contact messages ------------------------- */
+
+export async function createContactMessage(values: InsertContactMessage) {
+  const db = await requireDb();
+  const result = await db.insert(contactMessages).values(values).$returningId();
+  return result[0]?.id;
+}
+
+export async function listContactMessages() {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(contactMessages)
+    .orderBy(desc(contactMessages.createdAt))
+    .limit(200);
+}
