@@ -66,3 +66,13 @@
 - [x] Visual verification of all pages at desktop and mobile widths
 - [x] `prefers-reduced-motion` respected for non-essential motion
 - [x] Checkpoint saved before delivery
+
+## Static export for Cloudflare Pages (no React / TypeScript)
+
+- [ ] Plain `index.html` at the package root plus one HTML file per page
+- [ ] Single shared `styles.css` reproducing the dark neon/gold theme
+- [ ] Vanilla JS for mobile nav, blueprint animation, Rosie pop-ups, and audio player
+- [ ] Rosie image and all assets referenced with relative paths inside the package
+- [ ] Static music player reads a local `tracks.json` the owner can edit by hand
+- [ ] Document that owner-only admin panels and the contact form require the full-stack version
+- [ ] Verify every page renders and cross-links correctly, then package as a downloadable ZIP
