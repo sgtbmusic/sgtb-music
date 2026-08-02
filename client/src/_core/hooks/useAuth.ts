@@ -1,4 +1,5 @@
 import { startLogin } from "@/const";
+import { IS_STATIC_DEPLOYMENT } from "@/lib/runtime";
 import { trpc } from "@/lib/trpc";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback, useEffect, useMemo } from "react";
@@ -17,6 +18,7 @@ export function useAuth(options?: UseAuthOptions) {
   const utils = trpc.useUtils();
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
+    enabled: !IS_STATIC_DEPLOYMENT,
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -50,11 +52,18 @@ export function useAuth(options?: UseAuthOptions) {
     }
   }, [logoutMutation, utils]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "manus-runtime-user-info",
+        JSON.stringify(meQuery.data)
+      );
+    } catch {
+      // Storage can be unavailable in private browsing and embedded webviews.
+    }
+  }, [meQuery.data]);
+
   const state = useMemo(() => {
-    localStorage.setItem(
-      "manus-runtime-user-info",
-      JSON.stringify(meQuery.data)
-    );
     return {
       user: meQuery.data ?? null,
       loading: meQuery.isLoading || logoutMutation.isPending,

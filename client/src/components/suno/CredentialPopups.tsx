@@ -1,5 +1,11 @@
 import { cn } from "@/lib/utils";
-import { BadgeCheck, Heart, MessageCircle, Repeat2, UserPlus } from "lucide-react";
+import {
+  BadgeCheck,
+  Heart,
+  MessageCircle,
+  Repeat2,
+  UserPlus,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 type CredentialPopupsProps = {
@@ -48,14 +54,14 @@ export function CredentialPopups({
     const timers: number[] = [];
     items.forEach((_, index) => {
       timers.push(
-        window.setTimeout(() => setShown(index + 1), 260 + index * interval),
+        window.setTimeout(() => setShown(index + 1), 260 + index * interval)
       );
     });
     timers.push(
       window.setTimeout(
         () => onComplete?.(),
-        260 + items.length * interval + 900,
-      ),
+        260 + items.length * interval + 900
+      )
     );
 
     return () => timers.forEach(window.clearTimeout);
@@ -63,13 +69,20 @@ export function CredentialPopups({
   }, [items, interval]);
 
   return (
-    <div className={cn("relative isolate overflow-hidden rounded-2xl", className)}>
+    <div
+      data-testid="credential-popups"
+      className={cn("relative isolate overflow-hidden rounded-2xl", className)}
+    >
       {/* Blurred portrait backdrop */}
       {imageUrl ? (
         <img
           src={imageUrl}
           alt=""
           aria-hidden
+          width={900}
+          height={900}
+          loading="eager"
+          decoding="async"
           className="absolute inset-0 size-full scale-110 object-cover opacity-45 blur-2xl"
         />
       ) : (
@@ -79,9 +92,12 @@ export function CredentialPopups({
         />
       )}
       <div aria-hidden className="absolute inset-0 bg-ink/55" />
-      <div aria-hidden className="noise-texture absolute inset-0 opacity-[0.06]" />
+      <div
+        aria-hidden
+        className="noise-texture absolute inset-0 opacity-[0.06]"
+      />
 
-      <div className="relative flex min-h-[22rem] flex-col justify-end gap-2.5 p-4 sm:min-h-[26rem] sm:p-6">
+      <div className="relative flex min-h-[22rem] flex-col justify-end gap-2 p-3.5 sm:min-h-[26rem] sm:gap-2.5 sm:p-6">
         {items.map((credential, index) => {
           const kind = KINDS[index % KINDS.length];
           const visible = index < shown;
@@ -89,19 +105,25 @@ export function CredentialPopups({
             <div
               key={`${credential}-${index}`}
               role="status"
-              className="glass-panel flex items-center gap-3 rounded-xl px-3.5 py-3 shadow-lg transition-all duration-300 will-change-transform"
+              aria-hidden={!visible}
+              className="glass-panel flex items-center gap-3 rounded-xl px-3 py-2.5 shadow-lg transition-all duration-300 will-change-transform sm:px-3.5 sm:py-3"
               style={{
                 transitionTimingFunction: "var(--ease-out)",
                 opacity: visible ? 1 : 0,
                 transform: visible
                   ? "translateY(0) scale(1)"
                   : "translateY(16px) scale(0.96)",
-              }}>
+              }}
+            >
               <span className="relative shrink-0">
                 {imageUrl ? (
                   <img
                     src={imageUrl}
                     alt=""
+                    width={40}
+                    height={40}
+                    loading="eager"
+                    decoding="async"
                     className="size-10 rounded-full object-cover ring-1 ring-white/25"
                   />
                 ) : (
@@ -116,11 +138,13 @@ export function CredentialPopups({
 
               <div className="min-w-0 flex-1">
                 <p className="flex items-center gap-1.5 text-xs text-white/70">
-                  <span className="truncate font-semibold text-white">{name}</span>
+                  <span className="truncate font-semibold text-white">
+                    {name}
+                  </span>
                   <BadgeCheck className="size-3.5 shrink-0 text-neon" />
                   <span className="truncate">{kind.verb}</span>
                 </p>
-                <p className="mt-0.5 truncate text-sm font-medium text-white">
+                <p className="mt-0.5 line-clamp-2 text-sm leading-snug font-medium text-white">
                   {credential}
                 </p>
               </div>
@@ -137,4 +161,3 @@ export function CredentialPopups({
     </div>
   );
 }
-

@@ -1,6 +1,7 @@
 export const BRAND = "SGTB Music";
 
-export const ROSIE_IMAGE = "/manus-storage/rosie-nguyen_32cbb9fe.jpeg";
+export const ROSIE_IMAGE = "/images/rosie-nguyen.jpeg";
+export const CONTACT_EMAIL = "booking@sgtbmusic.com";
 
 export const NAV_LINKS = [
   { href: "/home", label: "Home" },
@@ -30,7 +31,8 @@ export const PIPELINE = [
     id: "structure",
     step: "03",
     label: "Song Structure",
-    caption: "Intro, verse, pre, hook, bridge, and outro arranged like a record.",
+    caption:
+      "Intro, verse, pre, hook, bridge, and outro arranged like a record.",
   },
   {
     id: "protools",
@@ -95,7 +97,9 @@ export function parseCredentials(raw: string | null | undefined): string[] {
   try {
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) {
-      return parsed.filter((item): item is string => typeof item === "string" && item.length > 0);
+      return parsed.filter(
+        (item): item is string => typeof item === "string" && item.length > 0
+      );
     }
   } catch {
     // Fall back to comma-separated values for hand-edited rows.
