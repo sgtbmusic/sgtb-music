@@ -1,4 +1,3 @@
-import { jsxLocPlugin } from "@builder.io/vite-plugin-jsx-loc";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import fs from "node:fs";
@@ -154,9 +153,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     tailwindcss(),
-    ...(mode === "development"
-      ? [jsxLocPlugin(), vitePluginManusRuntime()]
-      : []),
+    ...(mode === "development" ? [vitePluginManusRuntime()] : []),
     vitePluginManusDebugCollector(),
   ],
   resolve: {
@@ -186,7 +183,7 @@ export default defineConfig(({ mode }) => ({
     ],
     fs: {
       strict: true,
-      deny: ["**/.*"],
+      deny: ["**/.env", "**/.env.*", "**/*.crt", "**/*.pem"],
     },
   },
 }));
