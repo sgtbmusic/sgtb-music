@@ -1,3 +1,4 @@
+import CinematicSplash from "@/components/CinematicSplash";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -57,6 +58,7 @@ function Router() {
 function App() {
   return (
     <ThemeProvider defaultTheme="dark">
+      <CinematicSplash />
       <TooltipProvider>
         <Toaster />
         <Suspense fallback={<RouteLoader />}>
