@@ -441,3 +441,24 @@
     animation-duration: 1ms;
   }
 }
+
+@keyframes sgtb-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sgtb-page-enter {
+  animation: sgtb-page-enter 220ms var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sgtb-page-enter {
+    animation: none;
+  }
+}

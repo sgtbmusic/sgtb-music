@@ -27,7 +27,9 @@ export function SiteLayout({ children, variant = "default" }: SiteLayoutProps) {
         </div>
       )}
       <SiteNav />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <div className="sgtb-page-enter">{children}</div>
+      </main>
       <SiteFooter />
     </div>
   );

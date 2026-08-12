@@ -81,3 +81,11 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Create a dedicated Artist Draft Pool destination and route standard/guest entry there
 - [x] Keep the login copy accurate about Manus OAuth handling for email/password and Google continuation
 - [x] Re-verify /home, /about, /services, /music, /suno, and /contact after the gateway upgrade
+
+- [x] Add a Visuals/Cinematic Vault page to the main navigation
+- [x] Display all five intro and five transition videos in an on-demand gallery with controls
+- [x] Add a gold Watch Intro trigger in the main header that replays the gateway with audio
+- [x] Add a saved Play Cinematic Intro on Login preference, default true for new users
+- [x] Make the gateway honor the saved login preference without breaking manual replay
+- [x] Add fast navigation micro-transitions for Home, Suno Business, Music, and Draft Pool
+- [x] Verify the Vault, replay control, preference behavior, and existing routes; run tests

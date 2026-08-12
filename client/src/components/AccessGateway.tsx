@@ -22,6 +22,7 @@ import {
   TRANSITION_CLIPS,
   type IntroClip,
 } from "@/lib/introMedia";
+import { getPlayIntroOnLogin, INTRO_REPLAY_EVENT } from "@/lib/gatewayPreferences";
 
 const INTRO_SEEN_KEY = "sgtb-records-intro-seen";
 const AUTH_INTENT_KEY = "sgtb-records-auth-intent";
@@ -63,9 +64,10 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
   const [, navigate] = useLocation();
   const { user, loading, isAuthenticated } = useAuth();
   const hasSeenIntro = readSession(INTRO_SEEN_KEY) === "true";
-  const [visible, setVisible] = useState(!hasSeenIntro);
+  const playIntroOnLogin = getPlayIntroOnLogin();
+  const [visible, setVisible] = useState(!hasSeenIntro && playIntroOnLogin);
   const [phase, setPhase] = useState<GatewayPhase>(
-    hasSeenIntro ? "login" : "splash",
+    hasSeenIntro || !playIntroOnLogin ? "login" : "splash",
   );
   const [authIntent, setAuthIntent] = useState<AuthIntent>(
     readSession(AUTH_INTENT_KEY) === "rosie" ? "rosie" : "standard",
@@ -150,7 +152,20 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
   }, [authIntent, isAuthenticated, isOwner, loading, phase, visible]);
 
   useEffect(() => {
+    const replay = () => {
+      if (revealTimerRef.current) clearTimeout(revealTimerRef.current);
+      setVisible(true);
+      setIsExiting(false);
+      setMediaError(false);
+      setNotice(null);
+      setActiveClip(chooseRandomClip(INTRO_CLIPS));
+      setTransitionClip(chooseRandomClip(TRANSITION_CLIPS));
+      setPhase("intro");
+    };
+
+    window.addEventListener(INTRO_REPLAY_EVENT, replay);
     return () => {
+      window.removeEventListener(INTRO_REPLAY_EVENT, replay);
       if (revealTimerRef.current) clearTimeout(revealTimerRef.current);
     };
   }, []);

@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { NAV_LINKS, SUNO_NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
-import { Menu, Sparkles } from "lucide-react";
+import { Menu, PlayCircle, Settings2, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
+import { requestIntroReplay } from "@/lib/gatewayPreferences";
 
 function isActive(pathname: string, href: string) {
   if (href === "/home") return pathname === "/" || pathname === "/home";
@@ -68,6 +69,19 @@ export function SiteNav() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            onClick={requestIntroReplay}
+            variant="outline"
+            className="hidden h-9 border-gold/35 bg-gold/5 px-3 font-mono text-[10px] uppercase tracking-[0.16em] text-gold hover:bg-gold/15 hover:text-gold-soft sm:inline-flex"
+          >
+            <PlayCircle className="mr-2 size-3.5" /> Watch Intro
+          </Button>
+          <Link href="/settings" className="hidden lg:block" aria-label="Open settings">
+            <span className={cn("grid size-9 place-items-center rounded-md border border-white/10 text-muted-foreground transition hover:border-gold/30 hover:text-gold", pathname === "/settings" && "border-gold/35 bg-gold/5 text-gold")}>
+              <Settings2 className="size-4" />
+            </span>
+          </Link>
           <Link href={SUNO_NAV.href} className="hidden sm:block">
             <span
               className={cn(
@@ -108,6 +122,20 @@ export function SiteNav() {
                     </Link>
                   ))}
                 </nav>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    requestIntroReplay();
+                  }}
+                  variant="outline"
+                  className="h-12 border-gold/35 bg-gold/5 font-mono text-[10px] uppercase tracking-[0.16em] text-gold hover:bg-gold/15 hover:text-gold-soft"
+                >
+                  <PlayCircle className="mr-2 size-4" /> Watch Intro
+                </Button>
+                <Link href="/settings" className="flex items-center gap-3 rounded-md border border-white/10 px-3 py-3 font-condensed text-lg tracking-[0.14em] uppercase text-muted-foreground hover:border-gold/30 hover:text-gold">
+                  <Settings2 className="size-4" /> Settings
+                </Link>
                 <Link href={SUNO_NAV.href}>
                   <span className="suno-nav-btn font-condensed flex items-center justify-center gap-2 rounded-md px-4 py-3 text-base tracking-[0.18em] text-white uppercase">
                     <Sparkles className="size-4 text-neon" />
