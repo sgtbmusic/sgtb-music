@@ -66,3 +66,18 @@
 - [x] Visual verification of all pages at desktop and mobile widths
 - [x] `prefers-reduced-motion` respected for non-essential motion
 - [x] Checkpoint saved before delivery
+
+- [x] Add click-to-enter ENTER SGTB RECORDS splash gateway with no autoplay before interaction
+- [x] Add randomized two-stage intro playback using five intro clips and five transition clips
+- [x] Add splash completion/skip fade transition and sessionStorage one-time playback
+- [x] Add login terminal with email/password, Google continuation, Guest access, and Rosie VIP portal
+- [x] Route standard users and Guests to the homepage/Artist Draft Pool and Rosie to Suno Business
+- [x] Verify all existing routes and run unit tests after the gateway upgrade
+
+Do not add unverified credentials or claim a client-side Rosie button is cryptographically secure; production VIP access must use server-side authentication.
+
+- [x] Replace placeholder splash media slots with real uploaded intro and transition clip URLs when the 10 clips are provided
+- [x] Apply the dust-wipe transition when Skip Intro or video completion moves to login
+- [x] Create a dedicated Artist Draft Pool destination and route standard/guest entry there
+- [x] Keep the login copy accurate about Manus OAuth handling for email/password and Google continuation
+- [x] Re-verify /home, /about, /services, /music, /suno, and /contact after the gateway upgrade

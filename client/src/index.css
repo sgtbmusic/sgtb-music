@@ -409,3 +409,35 @@
     animation: sgtb-spin-slow 18s linear infinite;
   }
 }
+
+
+/* ---------- Access gateway transitions ---------- */
+@keyframes sgtb-dust-wipe {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+  55% {
+    opacity: 1;
+    transform: translateX(18%);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+    filter: blur(8px);
+  }
+}
+
+.sgtb-splash-exit {
+  animation: sgtb-dust-wipe 620ms var(--ease-in-out) forwards;
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sgtb-splash-exit {
+    animation-duration: 1ms;
+  }
+}

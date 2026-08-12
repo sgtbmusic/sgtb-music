@@ -4,6 +4,8 @@ import NotFound from "@/pages/NotFound";
 import { Redirect, Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import AccessGateway from "./components/AccessGateway";
+import ArtistDraftPool from "./pages/ArtistDraftPool";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Home from "./pages/Home";
@@ -17,6 +19,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/home" component={Home} />
       <Route path="/about" component={About} />
+      <Route path="/artist-draft-pool" component={ArtistDraftPool} />
       <Route path="/services" component={Services} />
       <Route path="/music" component={Music} />
       <Route path="/suno" component={Suno} />
@@ -35,7 +38,9 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <AccessGateway>
+            <Router />
+          </AccessGateway>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
