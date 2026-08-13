@@ -89,3 +89,7 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Make the gateway honor the saved login preference without breaking manual replay
 - [x] Add fast navigation micro-transitions for Home, Suno Business, Music, and Draft Pool
 - [x] Verify the Vault, replay control, preference behavior, and existing routes; run tests
+- [x] Implement three-tier role model (User/Artist, Suno Rep/Rosie, Owner Admin) with backend procedure support
+- [x] Build storage-backed upload workflow with rep/admin moderation queues and pending submission status
+- [x] Build advanced Admin Portal page with glowing navbar indicator, full system management, and Suno-rep moderation access
+- [x] Upgrade Artist Draft Pool into an analytics-focused "sports-betting / financial-market" style review workspace displaying stats, genre, style, and hit potential indicators

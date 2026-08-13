@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { NAV_LINKS, SUNO_NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
-import { Menu, PlayCircle, Settings2, Sparkles } from "lucide-react";
+import { Menu, PlayCircle, Settings2, ShieldCheck, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { requestIntroReplay } from "@/lib/gatewayPreferences";
@@ -82,6 +82,11 @@ export function SiteNav() {
               <Settings2 className="size-4" />
             </span>
           </Link>
+          <Link href="/admin-portal" className="hidden sm:block" aria-label="Admin Portal">
+            <span className={cn("font-display inline-flex items-center gap-1.5 rounded-md border border-gold/50 bg-gold/10 px-3 py-1.5 text-xs uppercase tracking-wider text-gold shadow-[0_0_15px_rgba(244,191,55,0.25)] transition hover:bg-gold/25", pathname === "/admin-portal" && "ring-2 ring-gold")}>
+              <ShieldCheck className="size-3.5 text-gold animate-pulse" /> Admin Portal
+            </span>
+          </Link>
           <Link href={SUNO_NAV.href} className="hidden sm:block">
             <span
               className={cn(
@@ -135,6 +140,9 @@ export function SiteNav() {
                 </Button>
                 <Link href="/settings" className="flex items-center gap-3 rounded-md border border-white/10 px-3 py-3 font-condensed text-lg tracking-[0.14em] uppercase text-muted-foreground hover:border-gold/30 hover:text-gold">
                   <Settings2 className="size-4" /> Settings
+                </Link>
+                <Link href="/admin-portal" className="flex items-center gap-3 rounded-md border border-gold/40 bg-gold/10 px-3 py-3 font-condensed text-lg tracking-[0.14em] uppercase text-gold shadow-[0_0_20px_rgba(244,191,55,0.2)]">
+                  <ShieldCheck className="size-4 text-gold animate-pulse" /> Admin Portal
                 </Link>
                 <Link href={SUNO_NAV.href}>
                   <span className="suno-nav-btn font-condensed flex items-center justify-center gap-2 rounded-md px-4 py-3 text-base tracking-[0.18em] text-white uppercase">

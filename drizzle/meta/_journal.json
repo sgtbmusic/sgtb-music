@@ -15,6 +15,20 @@
       "when": 1785593745934,
       "tag": "0001_flippant_hairball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1786623361440,
+      "tag": "0002_marvelous_stellaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1786623398922,
+      "tag": "0003_aromatic_iron_monger",
+      "breakpoints": true
     }
   ]
 }

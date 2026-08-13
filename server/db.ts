@@ -109,6 +109,16 @@ async function requireDb() {
 export async function listTracks() {
   const db = await getDb();
   if (!db) return [];
+  return db
+    .select()
+    .from(tracks)
+    .where(eq(tracks.status, "approved"))
+    .orderBy(asc(tracks.sortOrder), asc(tracks.id));
+}
+
+export async function listAllTracksAdmin() {
+  const db = await getDb();
+  if (!db) return [];
   return db.select().from(tracks).orderBy(asc(tracks.sortOrder), asc(tracks.id));
 }
 

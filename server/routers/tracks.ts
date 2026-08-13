@@ -3,10 +3,11 @@ import {
   createTrack,
   deleteTrack,
   getMaxTrackSortOrder,
+  listAllTracksAdmin,
   listTracks,
   updateTrack,
 } from "../db";
-import { adminProcedure, publicProcedure, router } from "../_core/trpc";
+import { adminProcedure, protectedProcedure, publicProcedure, repOrAdminProcedure, router } from "../_core/trpc";
 
 const trackInput = z.object({
   title: z.string().min(1).max(200),
@@ -25,11 +26,37 @@ const trackInput = z.object({
 export const tracksRouter = router({
   list: publicProcedure.query(() => listTracks()),
 
+  listAdmin: repOrAdminProcedure.query(() => listAllTracksAdmin()),
+
   create: adminProcedure.input(trackInput).mutation(async ({ input }) => {
     const nextOrder = (await getMaxTrackSortOrder()) + 1;
-    const id = await createTrack({ ...input, sortOrder: nextOrder });
+    const id = await createTrack({ ...input, sortOrder: nextOrder, status: "approved" });
     return { id };
   }),
+
+  submit: protectedProcedure.input(trackInput).mutation(async ({ ctx, input }) => {
+    const nextOrder = (await getMaxTrackSortOrder()) + 1;
+    const isPrivileged = ctx.user.role === "admin" || ctx.user.role === "rep";
+    const id = await createTrack({
+      ...input,
+      sortOrder: nextOrder,
+      status: isPrivileged ? "approved" : "pending",
+      uploaderId: ctx.user.id,
+    });
+    return { id, status: isPrivileged ? "approved" : "pending" };
+  }),
+
+  moderate: repOrAdminProcedure
+    .input(
+      z.object({
+        id: z.number().int().positive(),
+        status: z.enum(["approved", "rejected"]),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      await updateTrack(input.id, { status: input.status });
+      return { success: true } as const;
+    }),
 
   update: adminProcedure
     .input(

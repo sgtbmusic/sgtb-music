@@ -14,6 +14,7 @@ import Services from "./pages/Services";
 import Suno from "./pages/Suno";
 import Visuals from "./pages/Visuals";
 import Settings from "./pages/Settings";
+import AdminPortal from "./pages/AdminPortal";
 
 function Router() {
   return (
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/suno" component={Suno} />
       <Route path="/visuals" component={Visuals} />
       <Route path="/settings" component={Settings} />
+      <Route path="/admin-portal" component={AdminPortal} />
       <Route path="/contact" component={Contact} />
       <Route path="/404" component={NotFound} />
       {/* Legacy/alias paths keep deep links working */}
