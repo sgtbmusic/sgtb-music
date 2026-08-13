@@ -101,6 +101,38 @@ export const sunoEpisodes = mysqlTable("sunoEpisodes", {
 export type SunoEpisode = typeof sunoEpisodes.$inferSelect;
 export type InsertSunoEpisode = typeof sunoEpisodes.$inferInsert;
 
+export const executiveCatalog = mysqlTable("executiveCatalog", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 200 }).notNull(),
+  artist: varchar("artist", { length: 200 }).notNull(),
+  category: mysqlEnum("category", ["Suno Voice Persona", "Hybrid Stems (Pro Tools Mix)", "Live Sync Concepts"]).notNull(),
+  audioUrl: text("audioUrl").notNull(),
+  stemPackageUrl: text("stemPackageUrl"),
+  bpm: int("bpm").default(120).notNull(),
+  genre: varchar("genre", { length: 100 }).default("Pop / Cinematic").notNull(),
+  hitPotential: int("hitPotential").default(95).notNull(),
+  description: text("description"),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ExecutiveCatalogItem = typeof executiveCatalog.$inferSelect;
+export type InsertExecutiveCatalogItem = typeof executiveCatalog.$inferInsert;
+
+export const executiveMeetings = mysqlTable("executiveMeetings", {
+  id: int("id").autoincrement().primaryKey(),
+  executiveName: varchar("executiveName", { length: 200 }).notNull(),
+  organization: varchar("organization", { length: 200 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  requestedDate: varchar("requestedDate", { length: 100 }).notNull(),
+  notes: text("notes"),
+  status: mysqlEnum("status", ["pending", "confirmed", "completed"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ExecutiveMeeting = typeof executiveMeetings.$inferSelect;
+export type InsertExecutiveMeeting = typeof executiveMeetings.$inferInsert;
+
 /** Inquiries submitted from /contact. */
 export const contactMessages = mysqlTable("contactMessages", {
   id: int("id").autoincrement().primaryKey(),

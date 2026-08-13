@@ -11,6 +11,10 @@ import {
   users,
   sunoEpisodes,
   InsertSunoEpisode,
+  executiveCatalog,
+  InsertExecutiveCatalogItem,
+  executiveMeetings,
+  InsertExecutiveMeeting,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -232,4 +236,30 @@ export async function getMaxSunoEpisodeSortOrder() {
     .orderBy(desc(sunoEpisodes.sortOrder))
     .limit(1);
   return rows[0]?.sortOrder ?? 0;
+}
+
+/* ----------------------- Executive Portal ------------------------- */
+
+export async function listExecutiveCatalog() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(executiveCatalog).orderBy(asc(executiveCatalog.sortOrder), asc(executiveCatalog.id));
+}
+
+export async function createExecutiveCatalogItem(values: InsertExecutiveCatalogItem) {
+  const db = await requireDb();
+  const result = await db.insert(executiveCatalog).values(values).$returningId();
+  return result[0]?.id;
+}
+
+export async function createExecutiveMeeting(values: InsertExecutiveMeeting) {
+  const db = await requireDb();
+  const result = await db.insert(executiveMeetings).values(values).$returningId();
+  return result[0]?.id;
+}
+
+export async function listExecutiveMeetings() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(executiveMeetings).orderBy(desc(executiveMeetings.createdAt));
 }

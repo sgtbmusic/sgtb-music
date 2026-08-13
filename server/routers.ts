@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { sunoEpisodesRouter } from "./routers/sunoEpisodes";
+import { executiveRouter } from "./routers/executive";
 import { contactRouter } from "./routers/contact";
 import { creatorsRouter } from "./routers/creators";
 import { tracksRouter } from "./routers/tracks";
@@ -22,6 +23,7 @@ export const appRouter = router({
     }),
   }),
   sunoEpisodes: sunoEpisodesRouter,
+  executive: executiveRouter,
 
   tracks: tracksRouter,
   creators: creatorsRouter,

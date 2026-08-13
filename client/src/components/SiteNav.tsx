@@ -23,6 +23,7 @@ const ORGANIZED_NAV = [
   { label: "Catalog", href: "/music" },
   { label: "Vault", href: "/visuals" },
   { label: "Draft Pool", href: "/artist-draft-pool" },
+  { label: "Executive HQ", href: "/suno-hq" },
   { label: "About", href: "/about" },
   { label: "Services", href: "/services" },
   { label: "Contact", href: "/contact" },

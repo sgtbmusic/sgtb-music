@@ -13,6 +13,7 @@ import Music from "./pages/Music";
 import Services from "./pages/Services";
 import Suno from "./pages/Suno";
 import Visuals from "./pages/Visuals";
+import ExecutiveHQ from "./pages/ExecutiveHQ";
 import Settings from "./pages/Settings";
 import AdminPortal from "./pages/AdminPortal";
 
@@ -27,8 +28,9 @@ function Router() {
       <Route path="/music" component={Music} />
       <Route path="/suno" component={Suno} />
       <Route path="/visuals" component={Visuals} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/admin-portal" component={AdminPortal} />
+      <Route path={"/visuals"} component={Visuals} />
+      <Route path={"/suno-hq"} component={ExecutiveHQ} />
+      <Route path={"/admin-portal"} component={AdminPortal} />
       <Route path="/contact" component={Contact} />
       <Route path="/404" component={NotFound} />
       {/* Legacy/alias paths keep deep links working */}

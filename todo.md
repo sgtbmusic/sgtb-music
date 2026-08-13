@@ -106,3 +106,12 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Build skippable new-user website guide component with rewards-coming-soon preview
 - [x] Build Suno Business podcast/radio player and admin-only upload workflow on /suno
 
+
+- [x] Add executive catalog and meeting request database schema tables and queries
+- [x] Build tRPC procedures for executive catalog items and high-priority meeting requests with rep/admin gating
+- [x] Build the dedicated /suno-hq Executive Pitch & Asset Portal page with dark neon-gold aesthetic
+- [x] Implement catalog showcase player with Suno Voice Persona, Hybrid Stems, and Live Sync categorization
+- [x] Implement one-click WAV/Stem package download triggers and visual metrics widget
+- [x] Implement interactive pipeline graphic and high-priority meeting request calendar/contact form
+- [x] Wire navigation links and role-gated access check for /suno-hq
+- [x] Run type check and vitest test suite, then save and publish checkpoint
