@@ -1,247 +1,148 @@
-import { PipelineBlueprint } from "@/components/PipelineBlueprint";
 import { SiteLayout } from "@/components/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import {
-  ArrowRight,
-  AudioWaveform,
-  Headphones,
-  Mic2,
-  Sparkles,
-  TrendingUp,
-  Waves,
-} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { PipelineBlueprint } from "@/components/PipelineBlueprint";
 import { Link } from "wouter";
-
-const HUMANIZE = [
-  {
-    icon: Mic2,
-    title: "Humanized Performance",
-    body: "Generated vocals get timing, tuning, breath, and dynamic treatment so the take reads as a performance instead of an output.",
-  },
-  {
-    icon: AudioWaveform,
-    title: "Real Song Structure",
-    body: "Arrangements are rebuilt into intro, verse, pre, hook, bridge, and outro with the pacing radio programmers expect.",
-  },
-  {
-    icon: Headphones,
-    title: "Industry Standard Mixes",
-    body: "Pro Tools sessions, referenced mixes, and competitive masters that hold up next to commercial releases.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Release and Growth",
-    body: "Distribution routing plus a social rollout so finished records actually find listeners.",
-  },
-];
-
-const STATS = [
-  { value: "Suno", label: "Native workflow" },
-  { value: "Pro Tools", label: "Engineering suite" },
-  { value: "DSP", label: "Distribution ready" },
-  { value: "24/7", label: "Studio pipeline" },
-];
+import { ArrowRight, ShieldCheck, Sparkles, Radio, Layers, Music2, Cpu, Mic2 } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { startLogin } from "@/const";
 
 export default function Home() {
+  const { isAuthenticated, user } = useAuth();
+
   return (
     <SiteLayout>
-      {/* ---------------- Hero ---------------- */}
-      <section className="relative overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,oklch(0.82_0.15_88_/_14%),transparent_55%),radial-gradient(circle_at_82%_78%,oklch(0.66_0.26_305_/_12%),transparent_55%)]"
-        />
+      <div className="relative overflow-hidden">
+        {/* Hero Section */}
+        <section className="container max-w-7xl pt-12 pb-20 sm:pt-20 sm:pb-32">
+          <div className="flex flex-col items-center text-center">
+            <Badge variant="outline" className="border-gold/40 bg-gold/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.28em] text-gold shadow-[0_0_20px_rgba(244,191,55,0.25)]">
+              <Sparkles className="mr-2 size-3.5 text-gold" /> The Elite B2B Bridge for Major Label Distribution
+            </Badge>
 
-        <div className="container relative grid items-center gap-12 py-16 lg:grid-cols-[1.15fr_0.85fr] lg:py-24">
-          <div>
-            <span className="glass-panel font-mono inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.65rem] tracking-[0.22em] text-neon uppercase">
-              <Waves className="size-3.5" />
-              Suno-native production house
-            </span>
-
-            <h1 className="font-display mt-6 text-[clamp(2.75rem,8.5vw,6rem)] uppercase">
-              <span className="block text-foreground">SGTB Music</span>
-              <span className="block text-gold-gradient text-glow-gold">
-                Bridges The Gap
-              </span>
+            <h1 className="mt-8 font-display text-5xl uppercase tracking-tight text-white sm:text-7xl lg:text-8xl max-w-5xl leading-none">
+              Engineering Radio-Ready Hits from <span className="text-gold-gradient">Suno Reference Demos.</span>
             </h1>
 
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              We humanize Suno songs and carry them all the way to industry standard —
-              or take your finished ideas back into Suno with a producer's ear. Radio
-              ready. Industry ready. Every single time.
+            <p className="mt-6 max-w-3xl text-lg sm:text-xl text-muted-foreground leading-relaxed font-sans">
+              SGTB Music Group operates as a premier <span className="text-gold font-semibold">AI A&amp;R Incubation Engine</span>. We prototype full commercial arrangements into pristine Reference Demos, execute rigorous <span className="text-neon font-semibold">Analog Re-Tracking</span> with studio session vocalists, and deliver turn-key Blueprints to major labels.
             </p>
 
-            <div className="mt-9 flex flex-wrap items-center gap-3">
-              <Link href="/music">
-                <Button
-                  size="lg"
-                  className="font-condensed bg-gold px-7 tracking-[0.16em] text-primary-foreground uppercase hover:bg-gold-soft">
-                  Hear The Catalog
-                  <ArrowRight className="ml-1 size-4" />
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+              <Link href="/suno">
+                <Button className="bg-gold text-[#17120a] hover:bg-gold-soft font-mono text-xs uppercase tracking-wider h-12 px-8 shadow-[0_0_25px_rgba(244,191,55,0.35)]">
+                  Explore Suno Business <ArrowRight className="ml-2 size-4" />
                 </Button>
               </Link>
-              <Link href="/suno">
-                <span className="suno-nav-btn font-condensed inline-flex h-11 items-center gap-2 rounded-md px-6 text-sm tracking-[0.18em] text-white uppercase">
-                  <Sparkles className="size-4 text-neon" />
-                  Suno Business
-                </span>
+              <Link href="/artist-draft-pool">
+                <Button variant="outline" className="border-gold/30 bg-gold/5 text-gold hover:bg-gold/15 hover:text-gold-soft font-mono text-xs uppercase tracking-wider h-12 px-8">
+                  View Artist Draft Pool
+                </Button>
               </Link>
-              <Link href="/services">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="font-condensed border-border px-7 tracking-[0.16em] uppercase hover:bg-secondary">
-                  The Process
+              <Link href="/suno-hq">
+                <Button variant="outline" className="border-neon/30 bg-neon/5 text-neon hover:bg-neon/15 hover:text-neon-soft font-mono text-xs uppercase tracking-wider h-12 px-8">
+                  Executive HQ Portal
                 </Button>
               </Link>
             </div>
 
-            <dl className="mt-12 grid max-w-xl grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
-              {STATS.map(stat => (
-                <div key={stat.label} className="border-l border-gold/30 pl-3">
-                  <dt className="font-condensed text-lg tracking-[0.08em] text-gold uppercase">
-                    {stat.value}
-                  </dt>
-                  <dd className="font-mono text-[0.65rem] tracking-[0.14em] text-muted-foreground uppercase">
-                    {stat.label}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            {/* Live Trust Banner */}
+            <div className="mt-16 grid w-full max-w-5xl grid-cols-2 gap-4 sm:grid-cols-4">
+              <div className="glass-panel glow-gold rounded-2xl border border-gold/20 p-5 text-left">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Core Strategy</p>
+                <p className="mt-2 font-display text-xl uppercase text-white">AI A&amp;R Engine</p>
+                <p className="mt-1 text-xs text-muted-foreground">Rapid commercial prototyping</p>
+              </div>
+              <div className="glass-panel glow-gold rounded-2xl border border-gold/20 p-5 text-left">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Studio Standard</p>
+                <p className="mt-2 font-display text-xl uppercase text-gold">Analog Re-Tracking</p>
+                <p className="mt-1 text-xs text-muted-foreground">Prine human vocal replacement</p>
+              </div>
+              <div className="glass-panel glow-gold rounded-2xl border border-gold/20 p-5 text-left">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Session Delivery</p>
+                <p className="mt-2 font-display text-xl uppercase text-white">Work-for-Hire</p>
+                <p className="mt-1 text-xs text-muted-foreground">Flat-fee vocal realization</p>
+              </div>
+              <div className="glass-panel glow-gold rounded-2xl border border-gold/20 p-5 text-left">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Label Scaling</p>
+                <p className="mt-2 font-display text-xl uppercase text-neon">Dynamic Persona</p>
+                <p className="mt-1 text-xs text-muted-foreground">Tailored market cadences</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* The Blueprint Workflow Section */}
+        <section className="container max-w-7xl py-16 border-t border-white/10">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="font-mono text-xs uppercase tracking-[0.24em] text-gold">Enterprise Architecture</span>
+            <h2 className="mt-3 font-display text-4xl uppercase tracking-wide text-white sm:text-5xl">
+              The Suno-to-Studio <span className="text-gold-gradient">Blueprint Delivery System.</span>
+            </h2>
+            <p className="mt-4 text-sm sm:text-base text-muted-foreground leading-relaxed">
+              We do not replace studio talent; we eliminate creative friction. SGTB acts as the ultimate starting line, providing major labels with fully arranged Reference Demos that streamline A&amp;R validation before committing live session musicians.
+            </p>
           </div>
 
-          {/* Marquee-style vertical statement panel */}
-          <div className="relative">
-            <div className="glass-panel anim-float relative overflow-hidden rounded-xl p-7">
-              <div
-                aria-hidden
-                className="absolute -top-16 -right-16 size-56 rounded-full bg-gold/12 blur-3xl"
-              />
-              <p className="font-mono text-[0.65rem] tracking-[0.28em] text-gold uppercase">
-                The Gap
+          <PipelineBlueprint />
+        </section>
+
+        {/* Bridging the Gap / Business Model Section */}
+        <section className="container max-w-7xl py-20 border-t border-white/10">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div>
+              <Badge variant="outline" className="border-neon/30 bg-neon/10 font-mono text-xs uppercase tracking-wider text-neon">
+                Industry Integration
+              </Badge>
+              <h2 className="mt-4 font-display text-4xl uppercase text-white sm:text-5xl leading-tight">
+                Bridging the Gap Between <span className="text-gold-gradient">AI Scale &amp; Major Standards.</span>
+              </h2>
+              <p className="mt-6 text-base text-muted-foreground leading-8">
+                As the premiere showcase label for AI-assisted commercial releases, SGTB Music bridges the gap between rapid algorithmic incubation and elite radio mastering. When established artists re-record our catalog in their own voice, we facilitate seamless <span className="text-gold font-semibold">Organic Interpolations</span>.
               </p>
-              <div className="mt-5 space-y-4">
-                <div className="rounded-lg border border-border bg-card/60 p-4">
-                  <p className="font-condensed text-sm tracking-[0.16em] text-muted-foreground uppercase">
-                    What Suno Gives You
-                  </p>
-                  <p className="mt-1.5 text-sm text-foreground/85">
-                    A fast, inspired idea with real commercial potential.
-                  </p>
+              <p className="mt-4 text-base text-muted-foreground leading-8">
+                For emerging vocalists, our <span className="text-neon font-semibold">Vocal Realization</span> sessions provide reliable work-for-hire opportunities that keep professional session musicians fully employed during the final polish phase.
+              </p>
+              <div className="mt-8 flex gap-4">
+                <Link href="/services">
+                  <Button className="bg-gold text-[#17120a] hover:bg-gold-soft font-mono text-xs uppercase tracking-wider h-11 px-6">
+                    View Enterprise Services
+                  </Button>
+                </Link>
+                <Link href="/about">
+                  <Button variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10 font-mono text-xs uppercase tracking-wider h-11 px-6">
+                    Our Corporate Philosophy
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="glass-panel glow-gold rounded-3xl border border-gold/30 p-8 sm:p-10 relative">
+              <div className="absolute -top-4 -right-4 rounded-2xl bg-gold text-[#17120a] px-4 py-2 font-mono text-xs uppercase font-bold shadow-lg">
+                Showcase Label
+              </div>
+              <h3 className="font-display text-3xl uppercase text-white">Dynamic Persona Engineering</h3>
+              <p className="mt-4 text-sm leading-7 text-muted-foreground">
+                Through our advanced CAMG workflow, we deliver <span className="text-gold">Dynamic Persona Engineering</span>—mass-producing tailored cadences, vocal textures, and instrumentals calibrated precisely to match a label's target demographic and market positioning.
+              </p>
+              <div className="mt-8 space-y-4 font-mono text-xs">
+                <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3.5">
+                  <Cpu className="size-5 text-gold shrink-0" />
+                  <span className="text-white">Algorithmic A&amp;R Incubation &amp; Reference Demos</span>
                 </div>
-                <div className="flex items-center justify-center">
-                  <span className="relative grid size-10 place-items-center rounded-full border border-gold/50 bg-gold/10">
-                    <span
-                      aria-hidden
-                      className="anim-pulse-ring absolute inset-0 rounded-full border border-gold/40"
-                    />
-                    <ArrowRight className="size-4 rotate-90 text-gold" />
-                  </span>
+                <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3.5">
+                  <Mic2 className="size-5 text-neon shrink-0" />
+                  <span className="text-white">Pristine Analog Re-Tracking &amp; Session Vocalists</span>
                 </div>
-                <div className="rounded-lg border border-gold/40 bg-gold/8 p-4">
-                  <p className="font-condensed text-sm tracking-[0.16em] text-gold uppercase">
-                    What SGTB Delivers
-                  </p>
-                  <p className="mt-1.5 text-sm text-foreground">
-                    A structured, engineered, distributed, promoted record.
-                  </p>
+                <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3.5">
+                  <Music2 className="size-5 text-gold shrink-0" />
+                  <span className="text-white">Global Distribution via DistroKid &amp; Sync Licensing</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ---------------- Blueprint ---------------- */}
-      <section className="container pb-16 lg:pb-24">
-        <PipelineBlueprint />
-      </section>
-
-      {/* ---------------- Humanizing transition ---------------- */}
-      <section className="relative border-y border-border bg-card/25">
-        <div className="container py-16 lg:py-24">
-          <div className="max-w-2xl">
-            <p className="font-mono text-[0.65rem] tracking-[0.28em] text-neon uppercase">
-              The Transition
-            </p>
-            <h2 className="font-display mt-3 text-[clamp(2rem,5vw,3.4rem)] uppercase">
-              Humanizing Suno,{" "}
-              <span className="text-neon-gradient">Then Raising The Standard</span>
-            </h2>
-            <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-              A generated song and a finished record are two different products. Our work
-              lives in the space between them: we keep the spark that made the idea
-              exciting, then apply the structural, technical, and commercial discipline
-              that a release actually requires.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {HUMANIZE.map((item, index) => (
-              <article
-                key={item.title}
-                className={cn(
-                  "group relative overflow-hidden rounded-lg border border-border bg-background/60 p-5",
-                  "transition-transform duration-200 hover:-translate-y-1",
-                )}
-                style={{ transitionTimingFunction: "var(--ease-out)" }}>
-                <span
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-                />
-                <span className="grid size-10 place-items-center rounded-md border border-gold/35 bg-gold/10 text-gold">
-                  <item.icon className="size-4.5" />
-                </span>
-                <h3 className="font-condensed mt-4 text-lg tracking-[0.1em] uppercase">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {item.body}
-                </p>
-                <span className="font-mono absolute right-4 bottom-3 text-2xl text-foreground/6">
-                  0{index + 1}
-                </span>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------- Closing CTA ---------------- */}
-      <section className="container py-16 lg:py-24">
-        <div className="glass-panel relative overflow-hidden rounded-xl px-6 py-12 text-center sm:px-12">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,oklch(0.82_0.15_88_/_16%),transparent_60%)]"
-          />
-          <h2 className="font-display relative text-[clamp(1.9rem,5vw,3.2rem)] uppercase">
-            Bring The Idea. <span className="text-gold-gradient">We Finish The Record.</span>
-          </h2>
-          <p className="relative mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Whether you start in Suno or bring a concept from scratch, SGTB Music handles
-            structure, engineering, distribution, and rollout.
-          </p>
-          <div className="relative mt-8 flex flex-wrap justify-center gap-3">
-            <Link href="/contact">
-              <Button
-                size="lg"
-                className="font-condensed bg-gold px-8 tracking-[0.16em] text-primary-foreground uppercase hover:bg-gold-soft">
-                Start A Project
-              </Button>
-            </Link>
-            <Link href="/about">
-              <Button
-                size="lg"
-                variant="outline"
-                className="font-condensed border-border px-8 tracking-[0.16em] uppercase hover:bg-secondary">
-                About SGTB Music
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </SiteLayout>
   );
 }

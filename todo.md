@@ -115,3 +115,9 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Implement interactive pipeline graphic and high-priority meeting request calendar/contact form
 - [x] Wire navigation links and role-gated access check for /suno-hq
 - [x] Run type check and vitest test suite, then save and publish checkpoint
+
+- [x] Audit all frontend components for outdated AI/production terms across homepage, Suno Business, About, and Services
+- [x] Rewrite homepage welcome guide and hero messaging with executive B2B tone and glossary terms (Reference Demos, Analog Re-Tracking, Dynamic Persona Engineering)
+- [x] Overwrite Suno Business copy with the four strategic pillars: AI A&R Engine, Blueprint Delivery System, Bridging the Gap, and The Showcase Label
+- [x] Overwrite About, Services, and Workflow sections to feature Vocal Realization work-for-hire sessions and Organic Interpolations
+- [x] Run type check and vitest test suite, then save and publish checkpoint with the updated copy

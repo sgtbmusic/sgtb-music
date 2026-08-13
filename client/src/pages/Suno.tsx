@@ -1,374 +1,243 @@
 import { SiteLayout } from "@/components/SiteLayout";
-import { CreatorEditorDialog } from "@/components/suno/CreatorEditorDialog";
-import { CreatorProfileDialog } from "@/components/suno/CreatorProfileDialog";
-import { CredentialPopups } from "@/components/suno/CredentialPopups";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useOwner } from "@/hooks/useOwner";
-import { parseCredentials } from "@/lib/site";
+import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { cn } from "@/lib/utils";
-import type { Creator } from "@shared/types";
-import {
-  BadgeCheck,
-  MousePointerClick,
-  Plus,
-  Settings,
-  Sparkles,
-  UserRound,
-} from "lucide-react";
-import { useMemo, useState } from "react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { useState } from "react";
+import { Sparkles, Users, Settings, ArrowUpRight } from "lucide-react";
+import { CredentialPopups } from "@/components/suno/CredentialPopups";
+import { CreatorProfileDialog } from "@/components/suno/CreatorProfileDialog";
+import { CreatorEditorDialog } from "@/components/suno/CreatorEditorDialog";
 import { SunoPodcastSection } from "@/components/suno/SunoPodcastSection";
+import type { Creator } from "@shared/types";
 
 export default function Suno() {
-  const { isOwner } = useOwner();
-  const { data: creators, isLoading } = trpc.creators.list.useQuery();
+  const { user } = useAuth();
+  const { data: creators = [], isLoading } = trpc.creators.list.useQuery();
 
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [selected, setSelected] = useState<Creator | null>(null);
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editorTarget, setEditorTarget] = useState<Creator | null>(null);
-  const [createMode, setCreateMode] = useState(false);
-  const [manageMode, setManageMode] = useState(false);
-  const [introDone, setIntroDone] = useState(false);
+  const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
+  const [editingCreator, setEditingCreator] = useState<Creator | null>(null);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
-  const featured = useMemo(
-    () => creators?.find(creator => creator.isFeatured) ?? creators?.[0] ?? null,
-    [creators],
-  );
-  const others = useMemo(
-    () => (creators ?? []).filter(creator => creator.id !== featured?.id),
-    [creators, featured],
-  );
+  const isAdmin = user && user.role === "admin";
 
-  const featuredCredentials = parseCredentials(featured?.credentials);
+  const fallbackRosie: Creator = {
+    id: 1,
+    name: "Rosie Nguyen",
+    role: "Head of Creators at Suno",
+    handle: "@rosie",
+    imageUrl: "/manus-storage/IMG_0041_84afc747.jpeg",
+    imageKey: null,
+    credentials: JSON.stringify([
+      "Head of Creators at Suno",
+      "Cofounder of Fanhouse (raised $22M, exited)",
+      "1M+ Creator & Industry Leader",
+      "Forbes 30 Under 30 Honoree"
+    ]),
+    bio: "Cofounded Fanhouse, a platform that helped thousands of creators make over $20M and raised over $22M (acquired in 2023). Head of Creators & Content at Suno. Content creator with experience growing and managing both personal and professional brands, growing personal accounts to 1M+.",
+    isPlaceholder: false,
+    isFeatured: true,
+    sortOrder: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
-  function openProfile(creator: Creator) {
-    setSelected(creator);
-    setProfileOpen(true);
-  }
-
-  function openEditor(creator: Creator | null, isCreate: boolean) {
-    setEditorTarget(creator);
-    setCreateMode(isCreate);
-    setEditorOpen(true);
-  }
+  const rosie = creators.find(c => c.name.toLowerCase().includes("rosie")) || fallbackRosie;
+  const otherCreators = creators.filter(c => c.id !== rosie.id);
 
   return (
-    <SiteLayout variant="suno">
-      {/* Distinct Suno backdrop: deep ink, aurora bloom, scanline grid */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-ink">
-        <div className="absolute -top-40 left-1/4 size-[42rem] rounded-full bg-neon/10 blur-[150px]" />
-        <div className="absolute top-1/2 -right-40 size-[38rem] rounded-full bg-neon-alt/12 blur-[150px]" />
-        <div className="absolute -bottom-40 left-0 size-[34rem] rounded-full bg-rose-500/8 blur-[150px]" />
-        <div
-          className="absolute inset-0 opacity-[0.5]"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, oklch(1 0 0 / 3%) 0px, oklch(1 0 0 / 3%) 1px, transparent 1px, transparent 4px)",
-          }}
-        />
-      </div>
-
-      <section className="relative">
-        <div className="container pt-14 pb-10 lg:pt-20">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <span className="glass-panel font-mono inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.62rem] tracking-[0.28em] text-neon uppercase">
-                <Sparkles className="size-3.5" />
-                Suno Business 101
-              </span>
-              <h1 className="font-display mt-6 text-[clamp(2.6rem,8vw,5.5rem)] leading-[0.9] text-white uppercase">
-                The People
-                <br />
-                <span className="text-neon-gradient">Behind Suno</span>
-              </h1>
-              <p className="mt-5 max-w-xl text-sm leading-relaxed text-white/65 sm:text-base">
-                SGTB Music builds directly on the Suno ecosystem. This is the room —
-                the operators, creators, and platform leaders shaping how music gets
-                made and monetized next.
-              </p>
-            </div>
-
-            {/* Owner-only settings entry */}
-            {isOwner && (
-              <div className="flex items-center gap-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      aria-label="Manage creator profiles"
-                      onClick={() => setManageMode(value => !value)}
-                      className={cn(
-                        "border-white/20 text-white hover:bg-white/10",
-                        manageMode && "border-neon/60 bg-neon/15 text-neon",
-                      )}>
-                      <Settings className={cn("size-4.5", manageMode && "anim-spin-slow")} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {manageMode ? "Exit manage mode" : "Manage profiles (owner only)"}
-                  </TooltipContent>
-                </Tooltip>
-                {manageMode && (
-                  <Button
-                    size="sm"
-                    className="font-condensed bg-neon tracking-[0.14em] text-ink uppercase hover:bg-neon/85"
-                    onClick={() => openEditor(null, true)}>
-                    <Plus className="mr-1 size-4" />
-                    Add profile
-                  </Button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------- Featured: Rosie ---------------- */}
-      <section className="container pb-14">
-        {isLoading || !featured ? (
-          <Skeleton className="h-[26rem] w-full rounded-2xl bg-white/5" />
-        ) : (
-          <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-            {/* Auto-playing notification stack on page load */}
-            <div className="relative">
-              {!introDone ? (
-                <CredentialPopups
-                  credentials={featuredCredentials}
-                  name={featured.name}
-                  handle={featured.handle}
-                  imageUrl={featured.imageUrl}
-                  interval={1200}
-                  onComplete={() => setIntroDone(true)}
-                  className="h-full min-h-[26rem] border border-white/12"
-                />
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => openProfile(featured)}
-                  aria-label={`Open ${featured.name}'s profile`}
-                  className="group relative block h-full min-h-[26rem] w-full overflow-hidden rounded-2xl border border-white/12 text-left">
-                  {featured.imageUrl ? (
-                    <img
-                      src={featured.imageUrl}
-                      alt={featured.name}
-                      className="anim-rise absolute inset-0 size-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
-                      style={{ transitionTimingFunction: "var(--ease-out)" }}
-                    />
-                  ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-neon/20 to-neon-alt/25" />
-                  )}
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 bg-gradient-to-t from-ink via-ink/30 to-transparent"
-                  />
-
-                  <div className="absolute inset-x-0 bottom-0 p-6">
-                    <p className="font-mono text-[0.62rem] tracking-[0.28em] text-neon uppercase">
-                      Featured Profile
-                    </p>
-                    <h2 className="font-display mt-2 text-4xl leading-none text-white uppercase sm:text-5xl">
-                      {featured.name}
-                    </h2>
-                    <p className="font-condensed mt-2 flex items-center gap-1.5 text-sm tracking-[0.14em] text-white/75 uppercase">
-                      <BadgeCheck className="size-4 text-neon" />
-                      {featured.role}
-                    </p>
-                    <span className="font-mono mt-4 inline-flex items-center gap-1.5 rounded-full border border-neon/50 bg-neon/12 px-3 py-1.5 text-[0.62rem] tracking-[0.2em] text-neon uppercase">
-                      <MousePointerClick className="size-3.5" />
-                      Click the profile
-                    </span>
-                  </div>
-                </button>
+    <SiteLayout>
+      <div className="container max-w-7xl py-12 sm:py-20">
+        {/* Header with Admin Settings Icon */}
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between border-b border-white/10 pb-12">
+          <div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="border-gold/40 bg-gold/10 font-mono text-xs uppercase tracking-[0.26em] text-gold">
+                <Sparkles className="mr-1.5 size-3.5 text-gold" /> Suno Business Enterprise Hub
+              </Badge>
+              {isAdmin && (
+                <Badge variant="outline" className="border-neon/40 bg-neon/10 font-mono text-xs uppercase tracking-wider text-neon">
+                  Admin Management Mode Active
+                </Badge>
               )}
             </div>
+            <h1 className="mt-4 font-display text-5xl uppercase leading-none text-white sm:text-7xl">
+              Suno Business &amp; <span className="text-gold-gradient">Industry Roster.</span>
+            </h1>
+            <p className="mt-5 max-w-3xl text-base leading-8 text-muted-foreground">
+              Strategic enterprise partnerships bridging advanced algorithmic incubation with major label distribution. Explore leadership profiles and our 4-part commercial deployment strategy.
+            </p>
+          </div>
 
-            {/* Credential + bio panel */}
-            <div className="glass-panel relative flex flex-col justify-center overflow-hidden rounded-2xl p-6 sm:p-9">
-              <div
-                aria-hidden
-                className="absolute -top-24 -right-24 size-64 rounded-full bg-neon/12 blur-3xl"
-              />
-              <p className="font-mono relative text-[0.62rem] tracking-[0.3em] text-neon uppercase">
-                Credentials
+          {isAdmin && (
+            <Button
+              type="button"
+              onClick={() => {
+                setEditingCreator(null);
+                setIsEditorOpen(true);
+              }}
+              className="bg-gold text-[#17120a] hover:bg-gold-soft font-mono text-xs uppercase tracking-wider h-11 px-6"
+            >
+              <Settings className="mr-2 size-4" /> Manage Profiles &amp; Roster
+            </Button>
+          )}
+        </div>
+
+        {/* The Four Strategic Pillars */}
+        <section className="mt-16">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="font-mono text-xs uppercase tracking-[0.24em] text-gold">Core Business Strategy</span>
+            <h2 className="mt-3 font-display text-3xl uppercase text-white sm:text-4xl">The SGTB Commercial Pipeline</h2>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="glass-panel glow-gold rounded-3xl border border-gold/20 p-6 flex flex-col justify-between">
+              <div>
+                <span className="font-mono text-xs text-gold">Pillar I</span>
+                <h3 className="mt-2 font-display text-xl uppercase text-white">The AI A&amp;R Engine</h3>
+                <p className="mt-3 text-xs leading-6 text-muted-foreground">
+                  Positioning SGTB Records as a premier A&amp;R incubation engine that rapidly prototypes full commercial arrangements and Suno Reference Demos at scale.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-white/10 font-mono text-[10px] text-gold uppercase">Incubation &amp; Prototyping</div>
+            </div>
+
+            <div className="glass-panel glow-gold rounded-3xl border border-gold/20 p-6 flex flex-col justify-between">
+              <div>
+                <span className="font-mono text-xs text-neon">Pillar II</span>
+                <h3 className="mt-2 font-display text-xl uppercase text-white">The Blueprint System</h3>
+                <p className="mt-3 text-xs leading-6 text-muted-foreground">
+                  We deliver fully realized Suno demos to major labels as verified Blueprints for their signed artists to acquire, adapt, and re-track.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-white/10 font-mono text-[10px] text-neon uppercase">Turn-Key Label Blueprints</div>
+            </div>
+
+            <div className="glass-panel glow-gold rounded-3xl border border-gold/20 p-6 flex flex-col justify-between">
+              <div>
+                <span className="font-mono text-xs text-gold">Pillar III</span>
+                <h3 className="mt-2 font-display text-xl uppercase text-white">Bridging the Gap</h3>
+                <p className="mt-3 text-xs leading-6 text-muted-foreground">
+                  An enhancement tool, not a replacement. We provide the ultimate starting line, keeping professional studio session musicians employed during final polish.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-white/10 font-mono text-[10px] text-gold uppercase">Human-AI Collaboration</div>
+            </div>
+
+            <div className="glass-panel glow-gold rounded-3xl border border-gold/20 p-6 flex flex-col justify-between">
+              <div>
+                <span className="font-mono text-xs text-neon">Pillar IV</span>
+                <h3 className="mt-2 font-display text-xl uppercase text-white">The Showcase Label</h3>
+                <p className="mt-3 text-xs leading-6 text-muted-foreground">
+                  Operating as the elite testing ground for the Suno-to-Studio pipeline, proving the commercial viability of AI-assisted major releases.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-white/10 font-mono text-[10px] text-neon uppercase">Commercial Proof of Concept</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Featured Profile: Rosie Nguyen */}
+        <section className="mt-20">
+          <div className="border-b border-white/10 pb-4">
+            <span className="font-mono text-xs uppercase tracking-[0.24em] text-gold">Executive Leadership</span>
+            <h2 className="mt-2 font-display text-3xl uppercase text-white sm:text-4xl">Featured Suno Authority</h2>
+          </div>
+
+          <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:items-center">
+            <div className="lg:col-span-5">
+              <div onClick={() => setSelectedCreator(rosie)} className="cursor-pointer">
+                <CredentialPopups
+                  credentials={["Head of Creators at Suno", "Cofounder of Fanhouse (raised $22M, exited)", "1M+ Creator & Industry Leader", "Forbes 30 Under 30 Honoree"]}
+                  name={rosie.name}
+                  handle={rosie.handle}
+                  imageUrl={rosie.imageUrl || "/manus-storage/IMG_0041_84afc747.jpeg"}
+                />
+              </div>
+            </div>
+            <div className="lg:col-span-7 space-y-6">
+              <Badge variant="outline" className="border-gold/30 bg-gold/10 font-mono text-xs uppercase text-gold">
+                Head of Creators at Suno
+              </Badge>
+              <h3 className="font-display text-4xl uppercase text-white">Rosie Nguyen</h3>
+              <p className="text-base leading-8 text-muted-foreground">
+                Cofounded Fanhouse, a platform that helped thousands of creators make over $20M and raised over $22M (acquired in 2023). Head of Creators &amp; Content at Suno. Content creator with experience growing and managing both personal and professional brands, growing personal accounts to 1M+.
               </p>
-
-              <ul className="relative mt-5 space-y-2.5">
-                {featuredCredentials.map((credential, index) => (
-                  <li
-                    key={credential}
-                    className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3"
-                    style={{
-                      animation: `sgtb-rise 520ms var(--ease-out) ${index * 70}ms both`,
-                    }}>
-                    <BadgeCheck className="mt-0.5 size-4 shrink-0 text-neon" />
-                    <span className="text-sm text-white/90">{credential}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <p className="relative mt-6 text-sm leading-relaxed text-white/70">
-                {featured.bio}
-              </p>
-
-              <div className="relative mt-7 flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-4 pt-2">
                 <Button
-                  className="font-condensed bg-neon tracking-[0.16em] text-ink uppercase hover:bg-neon/85"
-                  onClick={() => openProfile(featured)}>
-                  Open Full Profile
+                  type="button"
+                  onClick={() => setSelectedCreator(rosie)}
+                  className="bg-gold text-[#17120a] hover:bg-gold-soft font-mono text-xs uppercase tracking-wider h-11 px-6"
+                >
+                  View Interactive Profile &amp; Highlights
                 </Button>
-                {isOwner && manageMode && (
-                  <Button
-                    variant="outline"
-                    className="font-condensed border-white/20 tracking-[0.16em] text-white uppercase hover:bg-white/10"
-                    onClick={() => openEditor(featured, false)}>
-                    <Settings className="mr-1.5 size-4" />
-                    Edit
-                  </Button>
-                )}
               </div>
             </div>
           </div>
-        )}
-      </section>
+        </section>
 
-      {/* ---------------- Team grid ---------------- */}
-      <section className="container pb-20">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="font-mono text-[0.62rem] tracking-[0.3em] text-neon uppercase">
-              The Roster
-            </p>
-            <h2 className="font-display mt-2 text-3xl text-white uppercase sm:text-4xl">
-              More Suno Operators
-            </h2>
+        {/* Industry Roster Grid */}
+        <section className="mt-24">
+          <div className="border-b border-white/10 pb-4">
+            <span className="font-mono text-xs uppercase tracking-[0.24em] text-neon">Expanded Industry Roster</span>
+            <h2 className="mt-2 font-display text-3xl uppercase text-white sm:text-4xl">Suno Business Partners &amp; Reps</h2>
           </div>
-          <p className="font-mono max-w-sm text-[0.68rem] leading-relaxed tracking-[0.08em] text-white/45 uppercase">
-            Reserved slots. Details are added by the site owner.
-          </p>
-        </div>
 
-        {isLoading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <Skeleton key={index} className="aspect-4/5 rounded-xl bg-white/5" />
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {otherCreators.map((creator) => (
+              <div
+                key={creator.id}
+                onClick={() => setSelectedCreator(creator)}
+                className="glass-panel glow-gold group rounded-3xl border border-white/10 p-6 cursor-pointer transition hover:border-gold/50 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="size-14 rounded-2xl bg-gold/10 border border-gold/30 flex items-center justify-center overflow-hidden">
+                      {creator.imageUrl ? (
+                        <img src={creator.imageUrl} alt={creator.name} className="size-full object-cover" />
+                      ) : (
+                        <Users className="size-6 text-gold" />
+                      )}
+                    </div>
+                    <Badge variant="outline" className="border-gold/20 bg-white/5 font-mono text-[10px] text-gold uppercase">
+                      Active Rep
+                    </Badge>
+                  </div>
+                  <h4 className="mt-5 font-display text-2xl uppercase text-white group-hover:text-gold transition-colors">{creator.name}</h4>
+                  <p className="font-mono text-xs text-gold">{creator.role}</p>
+                  <p className="mt-3 text-xs leading-6 text-muted-foreground line-clamp-3">{creator.bio}</p>
+                </div>
+                <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between font-mono text-xs text-muted-foreground group-hover:text-white">
+                  <span>View Executive Dossier</span>
+                  <ArrowUpRight className="size-4 text-gold" />
+                </div>
+              </div>
             ))}
           </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {others.map((creator, index) => {
-              const credentials = parseCredentials(creator.credentials);
-              return (
-                <div key={creator.id} className="relative">
-                  <button
-                    type="button"
-                    onClick={() => openProfile(creator)}
-                    aria-label={`Open ${creator.name}'s profile`}
-                    className="group relative block aspect-4/5 w-full overflow-hidden rounded-xl border border-white/12 text-left transition-transform duration-200 hover:-translate-y-1"
-                    style={{
-                      transitionTimingFunction: "var(--ease-out)",
-                      animation: `sgtb-rise 520ms var(--ease-out) ${index * 60}ms both`,
-                    }}>
-                    {creator.imageUrl ? (
-                      <img
-                        src={creator.imageUrl}
-                        alt={creator.name}
-                        className="absolute inset-0 size-full object-cover object-top"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-ink to-neon/10">
-                        <div
-                          aria-hidden
-                          className="absolute inset-0 opacity-40"
-                          style={{
-                            backgroundImage:
-                              "repeating-linear-gradient(135deg, oklch(1 0 0 / 4%) 0 10px, transparent 10px 20px)",
-                          }}
-                        />
-                        <div className="absolute inset-0 grid place-items-center">
-                          <span className="grid size-16 place-items-center rounded-full border border-white/15 bg-white/5 text-white/35">
-                            <UserRound className="size-7" />
-                          </span>
-                        </div>
-                      </div>
-                    )}
+        </section>
 
-                    <div
-                      aria-hidden
-                      className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent"
-                    />
-
-                    <div className="absolute inset-x-0 bottom-0 p-4">
-                      {creator.isPlaceholder && (
-                        <span className="font-mono mb-2 inline-block rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[0.58rem] tracking-[0.2em] text-white/55 uppercase">
-                          Open slot
-                        </span>
-                      )}
-                      <h3 className="font-condensed text-xl leading-tight tracking-[0.06em] text-white uppercase">
-                        {creator.name}
-                      </h3>
-                      <p className="mt-0.5 truncate text-xs text-white/60">
-                        {creator.role}
-                      </p>
-                      <p className="font-mono mt-2 truncate text-[0.6rem] tracking-[0.16em] text-neon/80 uppercase">
-                        {credentials.length} highlights
-                      </p>
-                    </div>
-
-                    <span
-                      aria-hidden
-                      className="absolute inset-0 rounded-xl ring-0 ring-neon/0 transition-all duration-200 group-hover:ring-1 group-hover:ring-neon/50"
-                    />
-                  </button>
-
-                  {isOwner && manageMode && (
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      aria-label={`Edit ${creator.name}`}
-                      onClick={() => openEditor(creator, false)}
-                      className="absolute top-3 right-3 border-white/25 bg-ink/70 text-white backdrop-blur hover:bg-ink">
-                      <Settings className="size-4" />
-                    </Button>
-                  )}
-                </div>
-              );
-            })}
-
-            {isOwner && manageMode && (
-              <button
-                type="button"
-                onClick={() => openEditor(null, true)}
-                className="grid aspect-4/5 w-full place-items-center rounded-xl border border-dashed border-white/20 text-white/50 transition-colors duration-150 hover:border-neon/50 hover:text-neon">
-                <span className="flex flex-col items-center gap-2">
-                  <Plus className="size-7" />
-                  <span className="font-condensed text-sm tracking-[0.16em] uppercase">
-                    Add profile
-                  </span>
-                </span>
-              </button>
-            )}
-          </div>
-        )}
-      </section>
+        {/* Suno Business Podcast / Radio Talk Broadcast Player */}
+        <section className="mt-24">
+          <SunoPodcastSection />
+        </section>
+      </div>
 
       <CreatorProfileDialog
-        creator={selected}
-        open={profileOpen}
-        onOpenChange={setProfileOpen}
+        creator={selectedCreator}
+        open={!!selectedCreator}
+        onOpenChange={(open: boolean) => !open && setSelectedCreator(null)}
       />
-      <CreatorEditorDialog
-        creator={editorTarget}
-        open={editorOpen}
-        onOpenChange={setEditorOpen}
-        createMode={createMode}
-      />
-      <div className="container pb-28">
-        <SunoPodcastSection />
-      </div>
+
+      {isAdmin && (
+        <CreatorEditorDialog
+          creator={editingCreator}
+          open={isEditorOpen}
+          onOpenChange={(open: boolean) => {
+            setIsEditorOpen(open);
+            if (!open) setEditingCreator(null);
+          }}
+        />
+      )}
     </SiteLayout>
   );
 }

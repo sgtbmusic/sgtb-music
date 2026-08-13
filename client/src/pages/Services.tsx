@@ -15,59 +15,59 @@ import { Link } from "wouter";
 const SERVICES = [
   {
     icon: Sparkles,
-    name: "Suno Direction",
+    name: "AI A&R Incubation & Reference Demos",
     summary:
-      "Prompt strategy, generation passes, and take selection guided by a producer's ear.",
+      "Rapid commercial prototyping through our AI A&R Engine to establish hook placement, arrangement, and market viability.",
     points: [
-      "Concept and reference breakdown",
+      "Concept and Suno Reference Demo breakdown",
       "Prompt and style engineering",
-      "Take comparison and selection",
+      "Commercial take comparison and selection",
       "Stem and extension planning",
     ],
   },
   {
     icon: AudioWaveform,
-    name: "Song Structure Rebuild",
+    name: "Song Structure & Blueprint Delivery",
     summary:
-      "Arrangement work that turns a generated idea into a properly paced record.",
+      "Arrangement work that turns generated ideas into verified major label Blueprints.",
     points: [
       "Intro, verse, pre, hook, bridge, outro mapping",
-      "Section timing and energy curve",
+      "Section timing and energy curve for radio formats",
       "Hook placement and repetition strategy",
-      "Radio-length and full-length versions",
+      "Turn-key deliverable packaging for label A&R",
     ],
   },
   {
     icon: SlidersHorizontal,
-    name: "Pro Tools Engineering",
-    summary: "The technical pass that makes a song competitive on real systems.",
+    name: "Analog Re-Tracking & Pro Tools Mix",
+    summary: "Replacing digital placeholder vocals with clean, studio-recorded human vocalists and analog mixing.",
     points: [
-      "Vocal editing, tuning, and comping",
-      "Humanized timing and dynamics",
-      "Referenced mixing",
-      "Commercial-level mastering",
+      "Vocal Realization with professional session vocalists",
+      "Analog outboard processing and hybrid mixing",
+      "Organic Interpolation facilitation",
+      "Commercial-level mastering for major distribution",
     ],
   },
   {
     icon: Radio,
-    name: "Distribution Routing",
+    name: "Distribution & Showcase Routing",
     summary:
-      "Deciding where the record lives — and getting it there cleanly.",
+      "Deciding where the record lives — and deploying it cleanly to global streaming networks.",
     points: [
-      "Back into Suno for ecosystem release",
-      "Blackbox exclusive placement",
+      "Ecosystem release integration",
+      "Exclusive sync licensing and placement",
       "DistroKid delivery to DSPs",
       "Metadata, splits, and release scheduling",
     ],
   },
   {
     icon: Megaphone,
-    name: "Social Promotion & Growth",
-    summary: "The rollout that keeps a finished record moving after release day.",
+    name: "Dynamic Persona Engineering",
+    summary: "Mass-producing tailored cadences and instrumentals calibrated to match target market branding.",
     points: [
-      "Clip and short-form asset packaging",
-      "Release-week content calendar",
-      "Audience growth strategy",
+      "Tailored vocal texture generation",
+      "Release-week marketing asset packaging",
+      "Audience growth and sync strategy",
       "Performance review and iteration",
     ],
   },
@@ -77,10 +77,10 @@ export default function Services() {
   return (
     <SiteLayout>
       <PageHeader
-        eyebrow="Services"
-        title="The"
-        accent="Process"
-        description="Every service maps to a stage in the SGTB pipeline. Take the whole chain or plug in at the point where your project needs help."
+        eyebrow="Enterprise Services"
+        title="B2B Production"
+        accent="&amp; Workflow Tiers"
+        description="Every service maps to an executive stage in the SGTB pipeline. From AI A&amp;R Incubation to Analog Re-Tracking and Blueprint delivery."
       />
 
       <section className="container pb-14">
@@ -92,9 +92,9 @@ export default function Services() {
           {SERVICES.map((service, index) => (
             <article
               key={service.name}
-              className="glass-panel relative overflow-hidden rounded-xl p-6 transition-transform duration-200 hover:-translate-y-1"
+              className="glass-panel relative overflow-hidden rounded-xl p-6 transition-transform duration-200 hover:-translate-y-1 border border-gold/20"
               style={{ transitionTimingFunction: "var(--ease-out)" }}>
-              <span className="font-mono absolute top-5 right-6 text-3xl text-foreground/6">
+              <span className="font-mono absolute top-5 right-6 text-3xl text-foreground/10">
                 0{index + 1}
               </span>
               <span className="grid size-11 place-items-center rounded-md border border-gold/35 bg-gold/10 text-gold">
@@ -117,18 +117,17 @@ export default function Services() {
             </article>
           ))}
 
-          <div className="glass-panel flex flex-col justify-center gap-4 rounded-xl p-7 text-center lg:col-span-2">
+          <div className="glass-panel flex flex-col justify-center gap-4 rounded-xl p-7 text-center lg:col-span-2 border border-gold/30">
             <h2 className="font-display text-[clamp(1.7rem,4vw,2.6rem)] uppercase">
-              Not sure which stage you need?
+              Ready to Commission a Reference Demo?
             </h2>
             <p className="mx-auto max-w-lg text-sm leading-relaxed text-muted-foreground">
-              Send the song or the idea. We will tell you exactly what it takes to get it
-              to release quality — and what it does not need.
+              Submit your project brief to our AI A&amp;R Engine. We will provide an executive assessment on reference generation, analog re-tracking, and label blueprint delivery.
             </p>
             <div className="flex flex-wrap justify-center gap-3 pt-1">
               <Link href="/contact">
                 <Button className="font-condensed bg-gold px-7 tracking-[0.16em] text-primary-foreground uppercase hover:bg-gold-soft">
-                  Request A Review
+                  Request Partnership Review
                 </Button>
               </Link>
               <Link href="/suno">
