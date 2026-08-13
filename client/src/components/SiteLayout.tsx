@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteNav } from "@/components/SiteNav";
+import { OnboardingGuide } from "@/components/OnboardingGuide";
 import { useScrollTop } from "@/hooks/useScrollTop";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
@@ -27,6 +28,7 @@ export function SiteLayout({ children, variant = "default" }: SiteLayoutProps) {
         </div>
       )}
       <SiteNav />
+      <OnboardingGuide />
       <main className="flex-1">
         <div className="sgtb-page-enter">{children}</div>
       </main>

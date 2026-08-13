@@ -86,6 +86,21 @@ export const creators = mysqlTable("creators", {
 export type Creator = typeof creators.$inferSelect;
 export type InsertCreator = typeof creators.$inferInsert;
 
+export const sunoEpisodes = mysqlTable("sunoEpisodes", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 200 }).notNull(),
+  host: varchar("host", { length: 200 }).default("Rosie Nguyen & Guests").notNull(),
+  description: text("description"),
+  audioUrl: text("audioUrl").notNull(),
+  audioKey: varchar("audioKey", { length: 512 }).notNull(),
+  durationSeconds: int("durationSeconds"),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SunoEpisode = typeof sunoEpisodes.$inferSelect;
+export type InsertSunoEpisode = typeof sunoEpisodes.$inferInsert;
+
 /** Inquiries submitted from /contact. */
 export const contactMessages = mysqlTable("contactMessages", {
   id: int("id").autoincrement().primaryKey(),

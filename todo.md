@@ -93,3 +93,16 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Build storage-backed upload workflow with rep/admin moderation queues and pending submission status
 - [x] Build advanced Admin Portal page with glowing navbar indicator, full system management, and Suno-rep moderation access
 - [x] Upgrade Artist Draft Pool into an analytics-focused "sports-betting / financial-market" style review workspace displaying stats, genre, style, and hit potential indicators
+
+- [x] Add a far-right signed-in profile/avatar control with the user name and official login status
+- [x] Add a responsive account menu with profile, settings, role, and logout actions
+- [x] Upgrade account settings to show role-aware tools for users, Suno reps, and owner admin
+- [x] Clarify standard login, Google/Manus OAuth, Guest, and Rosie VIP handoff behavior
+- [x] Reorganize navbar for a clear visitor-to-member flow
+- [x] Add skippable new-user website guide with rewards-coming-soon preview
+- [x] Add Suno Business podcast/radio player with admin-only upload workflow
+- [x] Build far-right signed-in profile/avatar control and account menu in SiteNav.tsx
+- [x] Upgrade Settings.tsx with role-aware tools for users, Suno reps, and owner admin
+- [x] Build skippable new-user website guide component with rewards-coming-soon preview
+- [x] Build Suno Business podcast/radio player and admin-only upload workflow on /suno
+

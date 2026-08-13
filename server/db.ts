@@ -9,6 +9,8 @@ import {
   tracks,
   InsertUser,
   users,
+  sunoEpisodes,
+  InsertSunoEpisode,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -200,4 +202,34 @@ export async function listContactMessages() {
     .from(contactMessages)
     .orderBy(desc(contactMessages.createdAt))
     .limit(200);
+}
+
+/* -------------------------- Suno Episodes --------------------------- */
+
+export async function listSunoEpisodes() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(sunoEpisodes).orderBy(asc(sunoEpisodes.sortOrder), asc(sunoEpisodes.id));
+}
+
+export async function createSunoEpisode(values: InsertSunoEpisode) {
+  const db = await requireDb();
+  const result = await db.insert(sunoEpisodes).values(values).$returningId();
+  return result[0]?.id;
+}
+
+export async function deleteSunoEpisode(id: number) {
+  const db = await requireDb();
+  await db.delete(sunoEpisodes).where(eq(sunoEpisodes.id, id));
+}
+
+export async function getMaxSunoEpisodeSortOrder() {
+  const db = await getDb();
+  if (!db) return 0;
+  const rows = await db
+    .select({ sortOrder: sunoEpisodes.sortOrder })
+    .from(sunoEpisodes)
+    .orderBy(desc(sunoEpisodes.sortOrder))
+    .limit(1);
+  return rows[0]?.sortOrder ?? 0;
 }

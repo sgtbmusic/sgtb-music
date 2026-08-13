@@ -19,6 +19,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { SunoPodcastSection } from "@/components/suno/SunoPodcastSection";
 
 export default function Suno() {
   const { isOwner } = useOwner();
@@ -365,6 +366,9 @@ export default function Suno() {
         onOpenChange={setEditorOpen}
         createMode={createMode}
       />
+      <div className="container pb-28">
+        <SunoPodcastSection />
+      </div>
     </SiteLayout>
   );
 }
