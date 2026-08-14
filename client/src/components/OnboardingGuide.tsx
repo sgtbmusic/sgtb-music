@@ -31,8 +31,8 @@ export function OnboardingGuide() {
   const steps = [
     {
       eyebrow: "Welcome to SGTB Music",
-      title: "The Analog-to-Digital Bridge.",
-      desc: "SGTB Music operates as an elite A&R incubation engine, bridging generative AI composition with professional Analog Re-Tracking and major label distribution.",
+      title: "Reference Demos & Analog Re-Tracking.",
+      desc: "SGTB Music operates as an elite A&R incubation engine, generating Reference Demos via Suno and elevating them through professional Analog Re-Tracking and major label distribution.",
       icon: Sparkles,
       action: "Next",
     },
