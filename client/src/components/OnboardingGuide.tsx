@@ -83,8 +83,8 @@ export function OnboardingGuide() {
           <div className="mx-auto mb-6 grid size-16 place-items-center rounded-3xl border border-gold/30 bg-gold/10 text-gold shadow-[0_0_20px_rgba(244,191,55,0.2)]">
             <IconComponent className="size-8" />
           </div>
-          <h2 className="font-display text-3xl uppercase text-white sm:text-4xl">{current.title}</h2>
-          <p className="mt-4 text-sm leading-7 text-muted-foreground">{current.desc}</p>
+          <DialogTitle className="font-display text-3xl uppercase text-white sm:text-4xl">{current.title}</DialogTitle>
+          <DialogDescription className="mt-4 text-sm leading-7 text-muted-foreground">{current.desc}</DialogDescription>
         </div>
 
         <div className="flex items-center justify-between border-t border-white/10 pt-6">

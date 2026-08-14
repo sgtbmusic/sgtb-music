@@ -127,3 +127,6 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Build Persona Auto-Assigner widget for virtual artist generation in the upload form
 - [x] Build DDEX / DistroKid CSV export action in the track management table
 - [x] Verify build, run Vitest tests, and publish checkpoint
+
+- [x] Fix missing DialogTitle accessibility warning on /artist-draft-pool
+- [x] Verify DialogTitle/DialogDescription requirements and run tests before publishing the checkpoint
