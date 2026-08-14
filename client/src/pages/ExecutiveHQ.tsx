@@ -279,8 +279,8 @@ export default function ExecutiveHQ() {
             <div className="glass-panel rounded-3xl border border-white/10 p-6 sm:p-8 lg:col-span-2 flex flex-col justify-between">
               <div>
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neon">End-to-End Workflow</span>
-                <h3 className="mt-2 font-display text-2xl uppercase text-white">Humanizing Suno at Scale</h3>
-                <p className="mt-2 text-sm text-muted-foreground">Our proprietary studio architecture takes raw AI generations and transforms them into Billboard-ready radio and sync hits.</p>
+                <h3 className="mt-2 font-display text-2xl uppercase text-white">Analog Re-Tracking at Scale</h3>
+                <p className="mt-2 text-sm text-muted-foreground">Our proprietary studio architecture takes high-level Reference Demos through Analog Re-Tracking and delivers radio-ready masters for label and sync review.</p>
               </div>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-4">

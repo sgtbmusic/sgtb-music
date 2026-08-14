@@ -136,3 +136,11 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Update Home.tsx, Suno.tsx, About.tsx, and Services.tsx with the executive vocabulary (Reference Tracking, Analog Re-Tracking, Vocal Realization, Organic Interpolation, Dynamic Persona Engineering)
 - [x] Scan codebase with grep to ensure zero instances of "humanizing" remain in user-facing copy
 - [x] Run type check and vitest test suite, then save and publish checkpoint
+
+- [x] Audit mobile overflow in shared nav, page headers, badges, and homepage hero
+- [x] Fix mobile typography, wrapping, container width, and horizontal overflow behavior
+- [x] Verify key pages at phone and desktop widths, run tests, and publish checkpoint
+
+- [x] Replace the remaining "Humanized" login chip with approved executive vocabulary
+
+- [x] Replace remaining "humanized Suno" copy in Music.tsx and ExecutiveHQ.tsx with Reference Demo and Analog Re-Tracking language

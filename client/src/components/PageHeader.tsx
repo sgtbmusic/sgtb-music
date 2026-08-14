@@ -7,16 +7,16 @@ type PageHeaderProps = {
 
 export function PageHeader({ eyebrow, title, accent, description }: PageHeaderProps) {
   return (
-    <header className="container pt-14 pb-10 lg:pt-20">
-      <p className="font-mono text-[0.65rem] tracking-[0.3em] text-neon uppercase">
+    <header className="container min-w-0 pt-14 pb-10 lg:pt-20">
+      <p className="safe-wrap max-w-full font-mono text-[0.58rem] leading-5 tracking-[0.18em] text-neon uppercase sm:text-[0.65rem] sm:tracking-[0.3em]">
         {eyebrow}
       </p>
-      <h1 className="font-display mt-3 text-[clamp(2.4rem,7vw,4.8rem)] uppercase">
+      <h1 className="safe-wrap font-display mt-3 max-w-full text-[clamp(2.4rem,12vw,4.8rem)] uppercase">
         <span className="text-foreground">{title} </span>
         {accent && <span className="text-gold-gradient">{accent}</span>}
       </h1>
       {description && (
-        <p className="mt-5 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+        <p className="safe-wrap mt-5 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
           {description}
         </p>
       )}

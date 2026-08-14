@@ -103,7 +103,7 @@ export default function Music() {
             </h1>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
               Finished records from the SGTB pipeline. Press play, scrub the waveform, and
-              hear what humanized Suno production sounds like at release quality.
+              hear how Reference Demos become release-ready masters through professional Analog Re-Tracking.
             </p>
           </div>
 

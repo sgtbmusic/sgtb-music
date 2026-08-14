@@ -19,15 +19,15 @@ export default function Home() {
         
         <div className="container relative">
           <div className="mx-auto max-w-4xl text-center">
-            <Badge variant="outline" className="border-gold/30 bg-gold/5 font-mono text-[10px] uppercase tracking-[0.24em] text-gold-soft">
+            <Badge variant="outline" className="safe-wrap max-w-full border-gold/30 bg-gold/5 px-3 py-1.5 text-center font-mono text-[9px] leading-4 uppercase tracking-[0.14em] text-gold-soft sm:text-[10px] sm:tracking-[0.24em]">
               SGTB Records / The Analog-to-Digital Bridge
             </Badge>
             
-            <h1 className="mt-8 font-display text-[clamp(3.5rem,10vw,8rem)] uppercase leading-[0.85] text-white">
+            <h1 className="safe-wrap mt-8 max-w-full font-display text-[clamp(3rem,14vw,8rem)] uppercase leading-[0.86] text-white">
               SGTB Music <span className="text-gold-gradient">Bridges The Gap.</span>
             </h1>
             
-            <p className="mt-8 text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9">
+            <p className="safe-wrap mx-auto mt-8 max-w-3xl text-base leading-7 text-muted-foreground sm:text-xl sm:leading-9">
               We operate as the premier A&R incubation engine, taking high-level Reference Demos generated via Suno and elevating them through professional Analog Re-Tracking. Replacing digital placeholder tracks with clean, studio-recorded vocals and live session musicians to deliver radio-ready masters for major label distribution.
             </p>
 

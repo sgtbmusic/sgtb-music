@@ -462,3 +462,51 @@
     animation: none;
   }
 }
+
+
+/* ---------- Responsive overflow protection ---------- */
+@layer base {
+  html,
+  body,
+  #root {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+
+  h1,
+  h2,
+  h3,
+  p,
+  a,
+  button,
+  span {
+    overflow-wrap: anywhere;
+  }
+}
+
+@layer components {
+  .safe-wrap {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+}
+
+@media (max-width: 639px) {
+  .font-display {
+    letter-spacing: -0.015em;
+  }
+
+  .font-mono {
+    letter-spacing: 0.12em;
+  }
+}
