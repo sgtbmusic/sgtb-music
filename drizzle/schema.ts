@@ -17,6 +17,8 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "rep", "admin"]).default("user").notNull(),
+  avatarUrl: text("avatarUrl"),
+  pushEnabled: int("pushEnabled").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -168,3 +170,15 @@ export const contactMessages = mysqlTable("contactMessages", {
 
 export type ContactMessage = typeof contactMessages.$inferSelect;
 export type InsertContactMessage = typeof contactMessages.$inferInsert;
+
+export const cadenceTournaments = mysqlTable("cadence_tournaments", {
+  id: int("id").autoincrement().primaryKey(),
+  seasonName: varchar("seasonName", { length: 128 }).notNull(),
+  winnerName: varchar("winnerName", { length: 128 }).notNull(),
+  winningPoints: int("winningPoints").notNull(),
+  prizeDescription: text("prizeDescription").notNull(),
+  endedAt: timestamp("endedAt").defaultNow().notNull(),
+});
+
+export type CadenceTournament = typeof cadenceTournaments.$inferSelect;
+export type InsertCadenceTournament = typeof cadenceTournaments.$inferInsert;

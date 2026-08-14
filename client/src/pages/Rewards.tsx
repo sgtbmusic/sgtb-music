@@ -31,6 +31,7 @@ export default function Rewards() {
   });
 
   const { data: leaderboard } = trpc.rewards.leaderboard.useQuery();
+  const { data: pastTournaments } = trpc.rewards.pastTournaments.useQuery();
 
   const earnMutation = trpc.rewards.earnPoints.useMutation({
     onSuccess: (updated) => {
@@ -455,9 +456,13 @@ export default function Rewards() {
                           )}
                         </td>
                         <td className="py-3 px-4 text-white font-sans font-medium flex items-center gap-3">
-                          <div className={`size-8 rounded-full flex items-center justify-center font-display text-xs font-bold border ${rank === 1 ? 'bg-gold text-black border-gold shadow-[0_0_10px_rgba(244,191,55,0.4)]' : rank <= 3 ? 'bg-neon/20 text-neon border-neon/40' : 'bg-white/10 text-white border-white/20'}`}>
-                            {initials}
-                          </div>
+                          {row.avatarUrl ? (
+                            <img src={row.avatarUrl} alt={name} className="size-8 rounded-full object-cover border border-gold/40 shadow-[0_0_10px_rgba(244,191,55,0.3)] shrink-0" />
+                          ) : (
+                            <div className={`size-8 rounded-full flex items-center justify-center font-display text-xs font-bold border shrink-0 ${rank === 1 ? 'bg-gold text-black border-gold shadow-[0_0_10px_rgba(244,191,55,0.4)]' : rank <= 3 ? 'bg-neon/20 text-neon border-neon/40' : 'bg-white/10 text-white border-white/20'}`}>
+                              {initials}
+                            </div>
+                          )}
                           <span className="truncate max-w-[160px] sm:max-w-xs">{name}</span>
                         </td>
                         <td className="py-3 px-4">
@@ -480,6 +485,39 @@ export default function Rewards() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Past Tournament Hall of Fame */}
+          <div className="mt-10 pt-8 border-t border-white/10">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-gold">Hall of Fame</span>
+                <h4 className="font-display text-lg uppercase text-white mt-0.5">Past Seasonal Tournaments</h4>
+              </div>
+              <Award className="w-5 h-5 text-gold" />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              {pastTournaments && pastTournaments.length > 0 ? (
+                pastTournaments.map((tourn) => (
+                  <div key={tourn.id} className="p-4 rounded-2xl bg-black/40 border border-white/10">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs text-gold font-bold">{tourn.seasonName}</span>
+                      <span className="font-mono text-[10px] text-muted-foreground">Archived</span>
+                    </div>
+                    <div className="mt-3">
+                      <p className="font-display text-sm text-white">Winner: {tourn.winnerName}</p>
+                      <p className="text-xs text-neon font-mono mt-0.5">{tourn.winningPoints.toLocaleString()} pts</p>
+                      <p className="text-[11px] text-muted-foreground mt-2 border-t border-white/5 pt-2">{tourn.prizeDescription}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-3 py-4 text-center text-xs text-muted-foreground font-mono">
+                  No past tournament records archived yet.
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

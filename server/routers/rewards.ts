@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
-import { getUserRewards, updateUserRewards, listTopLeaderboard } from "../db";
+import { getUserRewards, updateUserRewards, listTopLeaderboard, listPastTournaments, updateUserAvatarAndPush } from "../db";
 
 export const rewardsRouter = router({
   myRewards: protectedProcedure.query(async ({ ctx }) => {
@@ -39,7 +39,6 @@ export const rewardsRouter = router({
 
       const newPoints = current.points + pointsDelta;
       
-      // Determine tier
       let newTier = "Listener";
       if (ctx.user.role === "admin" || ctx.user.role === "rep") {
         newTier = "Industry Partner";
@@ -62,4 +61,20 @@ export const rewardsRouter = router({
   leaderboard: publicProcedure.query(async () => {
     return listTopLeaderboard(10);
   }),
+
+  pastTournaments: publicProcedure.query(async () => {
+    return listPastTournaments();
+  }),
+
+  updateProfile: protectedProcedure
+    .input(
+      z.object({
+        avatarUrl: z.string().optional(),
+        pushEnabled: z.number().int().min(0).max(1).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await updateUserAvatarAndPush(ctx.user.id, input.avatarUrl, input.pushEnabled);
+      return { success: true };
+    }),
 });

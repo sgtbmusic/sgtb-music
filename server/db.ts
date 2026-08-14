@@ -9,6 +9,7 @@ import {
   tracks,
   InsertUser,
   users,
+  cadenceTournaments,
   sunoEpisodes,
   InsertSunoEpisode,
   executiveCatalog,
@@ -311,9 +312,26 @@ export async function listTopLeaderboard(limit = 10) {
       tier: userRewards.tier,
       userName: users.name,
       userEmail: users.email,
+      avatarUrl: users.avatarUrl,
     })
     .from(userRewards)
     .leftJoin(users, eq(userRewards.userId, users.id))
     .orderBy(desc(userRewards.points))
     .limit(limit);
+}
+
+export async function listPastTournaments() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(cadenceTournaments).orderBy(desc(cadenceTournaments.endedAt));
+}
+
+export async function updateUserAvatarAndPush(userId: number, avatarUrl?: string, pushEnabled?: number) {
+  const db = await getDb();
+  if (!db) return;
+  const updates: Record<string, any> = {};
+  if (avatarUrl !== undefined) updates.avatarUrl = avatarUrl;
+  if (pushEnabled !== undefined) updates.pushEnabled = pushEnabled;
+  if (Object.keys(updates).length === 0) return;
+  await db.update(users).set(updates).where(eq(users.id, userId));
 }

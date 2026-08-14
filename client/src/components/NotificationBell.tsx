@@ -1,11 +1,41 @@
-import { useState } from "react";
-import { Bell, Sparkles, Music, ArrowUpRight, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Bell, Sparkles, Music, ArrowUpRight, Check, Volume2 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { toast } from "sonner";
 
 export function NotificationBell() {
   const [unread, setUnread] = useState(true);
+  const [pushSubscribed, setPushSubscribed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      setPushSubscribed(Notification.permission === "granted");
+    }
+  }, []);
+
+  const handleTogglePush = async () => {
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      toast.error("Browser push notifications are not supported in this environment.");
+      return;
+    }
+    if (Notification.permission === "granted") {
+      setPushSubscribed(true);
+      toast.success("Browser push notifications already active!");
+      return;
+    }
+    const result = await Notification.requestPermission();
+    if (result === "granted") {
+      setPushSubscribed(true);
+      toast.success("Push notifications enabled! You will receive instant stem drop alerts.");
+      new Notification("SGTB Music Dispatch", {
+        body: "Push alerts successfully linked. Unreleased stem drops will now trigger instant alerts.",
+      });
+    } else {
+      toast.error("Push permission denied.");
+    }
+  };
 
   const notifications = [
     {
@@ -19,7 +49,7 @@ export function NotificationBell() {
     {
       id: 2,
       title: "Cadence Club Tournament Active",
-      description: "Season 04 points reset countdown is live. Climb the leaderboard for executive executive sync priority.",
+      description: "Season 04 points reset countdown is live. Climb the leaderboard for executive sync priority.",
       time: "1d ago",
       badge: "SEASONAL",
       link: "/rewards",
@@ -54,9 +84,14 @@ export function NotificationBell() {
             <Sparkles className="w-4 h-4 text-gold" />
             <h4 className="font-display text-sm uppercase text-white tracking-wider">Stem & Club Alerts</h4>
           </div>
-          <span className="font-mono text-[10px] text-muted-foreground uppercase px-2 py-0.5 rounded bg-white/5">
-            {notifications.length} New
-          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            className={`h-7 px-2.5 font-mono text-[10px] ${pushSubscribed ? 'bg-neon/20 text-neon border-neon/40' : 'bg-white/5 text-muted-foreground border-white/10'}`}
+            onClick={handleTogglePush}
+          >
+            <Volume2 className="w-3 h-3 mr-1" /> {pushSubscribed ? "Push Active" : "Enable Push"}
+          </Button>
         </div>
 
         <div className="mt-3 space-y-3 max-h-80 overflow-y-auto pr-1">

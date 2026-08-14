@@ -156,3 +156,8 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Implement seasonal points tournament with live countdown timer for Cadence Club reset
 - [x] Implement navbar notification bell with unreleased stem drop alerts
 - [x] Verify build, run Vitest tests, and publish checkpoint
+
+- [x] Add browser push subscription, seasonal snapshot, and avatar storage schema support
+- [x] Build account settings UI for custom avatar uploads and push notification opt-in toggle
+- [x] Build seasonal tournament history snapshots in Rewards.tsx
+- [x] Run type checks and tests, then save and publish checkpoint
