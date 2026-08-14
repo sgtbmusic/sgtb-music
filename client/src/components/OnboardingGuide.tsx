@@ -31,8 +31,8 @@ export function OnboardingGuide() {
   const steps = [
     {
       eyebrow: "Welcome to SGTB Music",
-      title: "Humanizing Suno.",
-      desc: "SGTB Music bridges the gap between AI generation and professional industry-ready mixing, arrangement, and distribution.",
+      title: "The Analog-to-Digital Bridge.",
+      desc: "SGTB Music operates as an elite A&R incubation engine, bridging generative AI composition with professional Analog Re-Tracking and major label distribution.",
       icon: Sparkles,
       action: "Next",
     },

@@ -130,3 +130,9 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 
 - [x] Fix missing DialogTitle accessibility warning on /artist-draft-pool
 - [x] Verify DialogTitle/DialogDescription requirements and run tests before publishing the checkpoint
+
+- [ ] Remove all instances of "humanizing", "taking out AI artifacts", and amateur AI terminology from onboarding guide, homepage, Suno Business, About, and Services
+- [ ] Update OnboardingGuide.tsx to feature "Analog-to-Digital Bridge" and "Reference Demos & Analog Re-Tracking" instead of "Humanizing Suno"
+- [ ] Update Home.tsx, Suno.tsx, About.tsx, and Services.tsx with the executive vocabulary (Reference Tracking, Analog Re-Tracking, Vocal Realization, Organic Interpolation, Dynamic Persona Engineering)
+- [ ] Scan codebase with grep to ensure zero instances of "humanizing" remain in user-facing copy
+- [ ] Run type check and vitest test suite, then save and publish checkpoint
