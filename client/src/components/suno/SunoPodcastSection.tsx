@@ -63,6 +63,11 @@ export function SunoPodcastSection() {
       return;
     }
 
+    if (audioFile.size > 80 * 1024 * 1024) {
+      toast.error("Podcast file exceeds the 80MB upload limit.");
+      return;
+    }
+
     setUploading(true);
     try {
       const base64Data = await fileToBase64(audioFile);
@@ -81,7 +86,7 @@ export function SunoPodcastSection() {
         durationSeconds: 180,
       });
     } catch (error: any) {
-      toast.error(`Upload failed: ${error.message}`);
+      toast.error(`Upload failed: ${error.message || "Invalid token or session expired. Please ensure you are logged in as admin."}`);
       setUploading(false);
     }
   }

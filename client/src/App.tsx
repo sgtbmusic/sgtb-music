@@ -14,9 +14,10 @@ import Services from "./pages/Services";
 import Suno from "./pages/Suno";
 import Visuals from "./pages/Visuals";
 import ExecutiveHQ from "./pages/ExecutiveHQ";
-import Settings from "./pages/Settings";
-import AdminPortal from "./pages/AdminPortal";
-import Rewards from "./pages/Rewards";
+import Settings from "@/pages/Settings";
+import AdminPortal from "@/pages/AdminPortal";
+import Rewards from "@/pages/Rewards";
+import { PersistentAudioPlayer } from "@/components/PersistentAudioPlayer";
 
 function Router() {
   return (
@@ -50,6 +51,7 @@ function App() {
           <Toaster />
           <AccessGateway>
             <Router />
+            <PersistentAudioPlayer />
           </AccessGateway>
         </TooltipProvider>
       </ThemeProvider>

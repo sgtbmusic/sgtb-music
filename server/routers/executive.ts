@@ -5,6 +5,7 @@ import {
   listExecutiveCatalog,
   listExecutiveMeetings,
 } from "../db";
+import { notifyOwner } from "../_core/notification";
 import { adminProcedure, publicProcedure, repOrAdminProcedure, router } from "../_core/trpc";
 
 const catalogInput = z.object({
@@ -37,6 +38,14 @@ export const executiveRouter = router({
 
   requestMeeting: publicProcedure.input(meetingInput).mutation(async ({ input }) => {
     const id = await createExecutiveMeeting(input);
+    try {
+      await notifyOwner({
+        title: `[Executive Briefing] ${input.executiveName} (${input.organization})`,
+        content: `Email: ${input.email}\nRequested Date: ${input.requestedDate || "ASAP"}\nNotes:\n${input.notes || "None provided"}\n\n---\nNotification destination: sgtbmusic.business@gmail.com\nReview in Executive HQ / Admin Portal.`,
+      });
+    } catch (err) {
+      console.warn("[Executive] Failed to dispatch owner notification:", err);
+    }
     return { id, success: true } as const;
   }),
 

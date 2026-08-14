@@ -19,7 +19,7 @@ const episodeInput = z.object({
 export const sunoEpisodesRouter = router({
   list: publicProcedure.query(() => listSunoEpisodes()),
 
-  create: adminProcedure.input(episodeInput).mutation(async ({ input }) => {
+  create: adminProcedure.input(episodeInput).mutation(async ({ input, ctx }) => {
     const nextOrder = (await getMaxSunoEpisodeSortOrder()) + 1;
     const id = await createSunoEpisode({ ...input, sortOrder: nextOrder });
     return { id };
