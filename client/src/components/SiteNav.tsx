@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SUNO_NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
-import { Menu, PlayCircle, Settings2, ShieldCheck, Sparkles, User, LogOut, Disc, LayoutDashboard } from "lucide-react";
+import { Menu, PlayCircle, Settings2, ShieldCheck, Sparkles, User, LogOut, Disc, LayoutDashboard, Inbox } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { requestIntroReplay } from "@/lib/gatewayPreferences";
@@ -154,11 +154,18 @@ export function SiteNav() {
                   </Link>
                 </DropdownMenuItem>
                 {isPrivileged && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/admin-portal" className="flex items-center gap-2.5 px-3 py-2.5 font-condensed text-sm tracking-wider uppercase text-gold hover:bg-gold/15 cursor-pointer rounded-md">
-                      <ShieldCheck className="size-4 text-gold" /> Admin & Moderation
-                    </Link>
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin-portal" className="flex items-center gap-2.5 px-3 py-2.5 font-condensed text-sm tracking-wider uppercase text-gold hover:bg-gold/15 cursor-pointer rounded-md">
+                        <ShieldCheck className="size-4 text-gold" /> Admin & Moderation
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin/inbox" className="flex items-center gap-2.5 px-3 py-2.5 font-condensed text-sm tracking-wider uppercase text-neon hover:bg-neon/15 cursor-pointer rounded-md">
+                        <Inbox className="size-4 text-neon" /> Secure Inbox (Leads)
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
                 )}
                 <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem

@@ -81,12 +81,24 @@ export default function Contact() {
                 <p className="max-w-sm text-sm text-muted-foreground">
                   Thanks for reaching out to SGTB Music. Expect a reply shortly.
                 </p>
-                <Button
-                  variant="outline"
-                  className="font-condensed mt-2 border-border tracking-[0.16em] uppercase hover:bg-secondary"
-                  onClick={() => setSubmitted(false)}>
-                  Send another
-                </Button>
+                <div className="flex flex-col gap-3 w-full max-w-sm mt-4">
+                  <Button
+                    variant="default"
+                    className="bg-gold text-[#17120a] hover:bg-gold-soft font-mono text-xs uppercase"
+                    onClick={() => {
+                      const mailto = `mailto:sgtbmusic.business@gmail.com?subject=SGTB Project Submission&body=Inquiry successfully captured in database.%0A%0AReview in platform owner inbox: https://sgtbmusic-pbepc3kz.manus.space/admin/inbox`;
+                      window.location.href = mailto;
+                    }}
+                  >
+                    Send Direct Mail (sgtbmusic.business@gmail.com)
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-border font-mono text-xs uppercase hover:bg-secondary"
+                    onClick={() => setSubmitted(false)}>
+                    Send another message
+                  </Button>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">

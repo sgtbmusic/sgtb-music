@@ -3,8 +3,9 @@ import { PageHeader } from "@/components/PageHeader";
 import { SiteLayout } from "@/components/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
-import { ShieldAlert, ShieldCheck, Sparkles, CheckCircle2, XCircle, Music, Users, BarChart3, Lock } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Sparkles, CheckCircle2, XCircle, Music, Users, BarChart3, Lock, Inbox } from "lucide-react";
 import { useState } from "react";
+import { Link } from "wouter";
 import { toast } from "sonner";
 
 export default function AdminPortal() {
@@ -57,12 +58,23 @@ export default function AdminPortal() {
   return (
     <SiteLayout>
       <div className="container py-12 sm:py-16">
-        <PageHeader
-          eyebrow={isAdmin ? "Master Command / Owner Admin" : "Suno Rep Portal / Moderation"}
-          title="The Command center."
-          accent="Command"
-          description={isAdmin ? "Full system control across the SGTB Music ecosystem. Review pending uploads, monitor track metrics, and manage catalog clearance." : "Authorized Suno platform review portal. Approve or reject artist submissions, moderate comments, and track draft pool velocity."}
-        />
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between mb-8">
+          <PageHeader
+            eyebrow={isAdmin ? "Master Command / Owner Admin" : "Suno Rep Portal / Moderation"}
+            title="The Command center."
+            accent="Command"
+            description={isAdmin ? "Full system control across the SGTB Music ecosystem. Review pending uploads, monitor track metrics, and manage catalog clearance." : "Authorized Suno platform review portal. Approve or reject artist submissions, moderate comments, and track draft pool velocity."}
+          />
+          {isAdmin && (
+            <div>
+              <Link href="/admin/inbox">
+                <Button className="bg-neon text-black hover:bg-neon/90 font-mono text-xs uppercase tracking-wider h-11 px-6 shadow-[0_0_20px_rgba(45,226,184,0.3)]">
+                  <Inbox className="mr-2 size-4" /> Secure Communications Inbox
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
 
         <div className="mt-8 flex flex-wrap items-center gap-3 border-b border-white/15 pb-6">
           <Button

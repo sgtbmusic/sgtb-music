@@ -16,6 +16,7 @@ import Visuals from "./pages/Visuals";
 import ExecutiveHQ from "./pages/ExecutiveHQ";
 import Settings from "@/pages/Settings";
 import AdminPortal from "@/pages/AdminPortal";
+import AdminInbox from "@/pages/AdminInbox";
 import Rewards from "@/pages/Rewards";
 import { PersistentAudioPlayer } from "@/components/PersistentAudioPlayer";
 
@@ -33,6 +34,7 @@ function Router() {
       <Route path={"/visuals"} component={Visuals} />
       <Route path={"/suno-hq"} component={ExecutiveHQ} />
       <Route path={"/admin-portal"} component={AdminPortal} />
+      <Route path={"/admin/inbox"} component={AdminInbox} />
       <Route path="/contact" component={Contact} />
       <Route path="/rewards" component={Rewards} />
       <Route path="/404" component={NotFound} />
