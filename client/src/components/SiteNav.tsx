@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { requestIntroReplay } from "@/lib/gatewayPreferences";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { NotificationBell } from "./NotificationBell";
 import { startLogin } from "@/const";
 import {
   DropdownMenu,
@@ -122,6 +123,8 @@ export function SiteNav() {
               </span>
             </Link>
           )}
+
+          <NotificationBell />
 
           {/* Far-Right Signed-in Profile Control */}
           {isAuthenticated && user ? (

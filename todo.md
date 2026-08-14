@@ -151,3 +151,8 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Implement dynamic leaderboard and pre-save / streaming support widget
 - [x] Register /rewards route in App.tsx and add Rewards navigation link
 - [x] Verify tests, check responsive layout, and publish checkpoint
+
+- [x] Add leaderboard custom badge icons and avatars for top-ranking members
+- [x] Implement seasonal points tournament with live countdown timer for Cadence Club reset
+- [x] Implement navbar notification bell with unreleased stem drop alerts
+- [x] Verify build, run Vitest tests, and publish checkpoint

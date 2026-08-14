@@ -3,12 +3,27 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Trophy, Award, Star, Music, Radio, Share2, Flame, ArrowUpRight, CheckCircle2, Lock, Gift, ShieldCheck } from "lucide-react";
+import { Trophy, Award, Star, Music, Radio, Share2, Flame, ArrowUpRight, CheckCircle2, Lock, Gift, ShieldCheck, Crown, Medal, Timer, Sparkles } from "lucide-react";
+import { useEffect, useState as useReactState } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
 
 export default function Rewards() {
   const { isAuthenticated } = useAuth();
+  const [timeLeft, setTimeLeft] = useState({ days: 4, hours: 18, minutes: 22, seconds: 45 });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
+        if (prev.minutes > 0) return { ...prev, minutes: 59, seconds: 59 };
+        if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        if (prev.days > 0) return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
+        return prev;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
   const utils = trpc.useUtils();
 
   const { data: rewards, isLoading } = trpc.rewards.myRewards.useQuery(undefined, {
@@ -66,6 +81,25 @@ export default function Rewards() {
           description="Engage with SGTB catalog drafts, Suno radio episodes, and industry releases to unlock unreleased stems, private virtual artist personas, and executive VIP passes."
           accent="Cadence Club"
         />
+
+        {/* Seasonal Tournament Countdown Banner */}
+        <div className="mb-8 p-4 rounded-2xl bg-gradient-to-r from-gold/15 via-gold/5 to-transparent border border-gold/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-gold/20 border border-gold/50 flex items-center justify-center text-gold">
+              <Timer className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] text-gold uppercase tracking-wider bg-gold/10 px-2 py-0.5 rounded">Seasonal Tournament</span>
+                <span className="font-mono text-[10px] text-muted-foreground">Season 04 Active</span>
+              </div>
+              <h4 className="font-display text-base text-white mt-0.5">Points Reset & Executive Prize Drop In:</h4>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 font-mono text-sm text-gold bg-black/40 px-4 py-2 rounded-xl border border-gold/20">
+            <span className="font-bold">{timeLeft.days}d</span> : <span className="font-bold">{timeLeft.hours}h</span> : <span className="font-bold">{timeLeft.minutes}m</span> : <span className="font-bold">{timeLeft.seconds}s</span>
+          </div>
+        </div>
 
         {/* User Stats Overview Banner */}
         <div className="mt-8 glass-panel rounded-3xl border border-white/10 p-6 sm:p-8 bg-gradient-to-br from-card/80 to-card/40 relative overflow-hidden">
@@ -391,26 +425,52 @@ export default function Rewards() {
                 <tr className="border-b border-white/10 text-muted-foreground uppercase text-[10px] tracking-wider">
                   <th className="py-3 px-4">Rank</th>
                   <th className="py-3 px-4">Member</th>
-                  <th className="py-3 px-4">Tier Badge</th>
+                  <th className="py-3 px-4">Tier Badge & Icon</th>
                   <th className="py-3 px-4 text-right">Cadence Points</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {leaderboard && leaderboard.length > 0 ? (
-                  leaderboard.map((row, idx) => (
-                    <tr key={row.id || idx} className="hover:bg-white/5 transition-colors">
-                      <td className="py-3 px-4 text-gold font-bold">#{idx + 1}</td>
-                      <td className="py-3 px-4 text-white font-sans font-medium">
-                        {row.userName || row.userEmail || `Member #${row.userId}`}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-0.5 rounded text-[10px] ${row.tier === 'Industry Partner' ? 'bg-neon/10 text-neon border border-neon/30' : row.tier === 'VIP Tastemaker' ? 'bg-gold/10 text-gold border border-gold/30' : 'bg-white/10 text-muted-foreground'}`}>
-                          {row.tier}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-right text-neon font-bold">{row.points.toLocaleString()} pts</td>
-                    </tr>
-                  ))
+                  leaderboard.map((row, idx) => {
+                    const rank = idx + 1;
+                    const name = row.userName || row.userEmail || `Member #${row.userId}`;
+                    const initials = name.slice(0, 2).toUpperCase();
+                    return (
+                      <tr key={row.id || idx} className="hover:bg-white/5 transition-colors">
+                        <td className="py-3 px-4">
+                          {rank === 1 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gold/20 text-gold font-bold border border-gold/40">
+                              <Crown className="w-3.5 h-3.5" /> #1
+                            </span>
+                          ) : rank === 2 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-300/20 text-slate-200 font-bold border border-slate-300/40">
+                              <Medal className="w-3.5 h-3.5 text-slate-300" /> #2
+                            </span>
+                          ) : rank === 3 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-600/20 text-amber-400 font-bold border border-amber-600/40">
+                              <Medal className="w-3.5 h-3.5 text-amber-500" /> #3
+                            </span>
+                          ) : (
+                            <span className="text-gold font-bold">#{rank}</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-white font-sans font-medium flex items-center gap-3">
+                          <div className={`size-8 rounded-full flex items-center justify-center font-display text-xs font-bold border ${rank === 1 ? 'bg-gold text-black border-gold shadow-[0_0_10px_rgba(244,191,55,0.4)]' : rank <= 3 ? 'bg-neon/20 text-neon border-neon/40' : 'bg-white/10 text-white border-white/20'}`}>
+                            {initials}
+                          </div>
+                          <span className="truncate max-w-[160px] sm:max-w-xs">{name}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] uppercase font-mono tracking-wider ${row.tier === 'Industry Partner' ? 'bg-neon/15 text-neon border border-neon/40' : row.tier === 'VIP Tastemaker' ? 'bg-gold/15 text-gold border border-gold/40' : 'bg-white/10 text-muted-foreground border border-white/10'}`}>
+                            {row.tier === 'Industry Partner' && <Sparkles className="w-3 h-3 text-neon" />}
+                            {row.tier === 'VIP Tastemaker' && <Star className="w-3 h-3 text-gold fill-gold" />}
+                            {row.tier}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-right text-neon font-bold">{row.points.toLocaleString()} pts</td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan={4} className="py-6 text-center text-muted-foreground">
