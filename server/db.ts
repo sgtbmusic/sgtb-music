@@ -15,6 +15,9 @@ import {
   InsertExecutiveCatalogItem,
   executiveMeetings,
   InsertExecutiveMeeting,
+  userRewards,
+  UserReward,
+  InsertUserReward,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -262,4 +265,55 @@ export async function listExecutiveMeetings() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(executiveMeetings).orderBy(desc(executiveMeetings.createdAt));
+}
+
+/* ----------------------- Rewards & Cadence Club ------------------------- */
+
+export async function getUserRewards(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select().from(userRewards).where(eq(userRewards.userId, userId)).limit(1);
+  if (rows[0]) return rows[0];
+
+  // Auto-provision initial rewards row for new user
+  const newRow: InsertUserReward = {
+    userId,
+    points: 150,
+    tracksListened: 3,
+    episodesListened: 1,
+    tracksShared: 0,
+    draftsRated: 2,
+    tier: "Listener",
+  };
+  try {
+    await db.insert(userRewards).values(newRow);
+    const created = await db.select().from(userRewards).where(eq(userRewards.userId, userId)).limit(1);
+    return created[0] || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function updateUserRewards(userId: number, values: Partial<InsertUserReward>) {
+  const db = await requireDb();
+  await db.update(userRewards).set(values).where(eq(userRewards.userId, userId));
+  return getUserRewards(userId);
+}
+
+export async function listTopLeaderboard(limit = 10) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({
+      id: userRewards.id,
+      userId: userRewards.userId,
+      points: userRewards.points,
+      tier: userRewards.tier,
+      userName: users.name,
+      userEmail: users.email,
+    })
+    .from(userRewards)
+    .leftJoin(users, eq(userRewards.userId, users.id))
+    .orderBy(desc(userRewards.points))
+    .limit(limit);
 }

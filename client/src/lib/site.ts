@@ -4,10 +4,11 @@ export const ROSIE_IMAGE = "/manus-storage/rosie-nguyen_32cbb9fe.jpeg";
 
 export const NAV_LINKS = [
   { href: "/home", label: "Home" },
+  { href: "/music", label: "Catalog" },
+  { href: "/rewards", label: "Rewards" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
-  { href: "/music", label: "Music" },
-  { href: "/visuals", label: "Visuals" },
+  { href: "/visuals", label: "Vault" },
   { href: "/contact", label: "Contact" },
 ] as const;
 

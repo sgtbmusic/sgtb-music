@@ -16,6 +16,7 @@ import Visuals from "./pages/Visuals";
 import ExecutiveHQ from "./pages/ExecutiveHQ";
 import Settings from "./pages/Settings";
 import AdminPortal from "./pages/AdminPortal";
+import Rewards from "./pages/Rewards";
 
 function Router() {
   return (
@@ -32,6 +33,7 @@ function Router() {
       <Route path={"/suno-hq"} component={ExecutiveHQ} />
       <Route path={"/admin-portal"} component={AdminPortal} />
       <Route path="/contact" component={Contact} />
+      <Route path="/rewards" component={Rewards} />
       <Route path="/404" component={NotFound} />
       {/* Legacy/alias paths keep deep links working */}
       <Route path="/suno-business">{() => <Redirect to="/suno" />}</Route>

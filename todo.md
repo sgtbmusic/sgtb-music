@@ -144,3 +144,10 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Replace the remaining "Humanized" login chip with approved executive vocabulary
 
 - [x] Replace remaining "humanized Suno" copy in Music.tsx and ExecutiveHQ.tsx with Reference Demo and Analog Re-Tracking language
+
+- [x] Add rewards data model, user points/tier helpers, and tRPC procedures
+- [x] Build the /rewards page with Cadence Club tiers (Listener, VIP Tastemaker, Industry Partner)
+- [x] Implement gamified points system (listening, sharing, rating drafts) and reward unlocks
+- [x] Implement dynamic leaderboard and pre-save / streaming support widget
+- [x] Register /rewards route in App.tsx and add Rewards navigation link
+- [x] Verify tests, check responsive layout, and publish checkpoint

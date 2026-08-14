@@ -108,6 +108,22 @@ export const sunoEpisodes = mysqlTable("sunoEpisodes", {
 export type SunoEpisode = typeof sunoEpisodes.$inferSelect;
 export type InsertSunoEpisode = typeof sunoEpisodes.$inferInsert;
 
+export const userRewards = mysqlTable("user_rewards", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull().unique(),
+  points: int("points").default(150).notNull(),
+  tracksListened: int("tracks_listened").default(3).notNull(),
+  episodesListened: int("episodes_listened").default(1).notNull(),
+  tracksShared: int("tracks_shared").default(0).notNull(),
+  draftsRated: int("drafts_rated").default(2).notNull(),
+  tier: varchar("tier", { length: 32 }).default("Listener").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserReward = typeof userRewards.$inferSelect;
+export type InsertUserReward = typeof userRewards.$inferInsert;
+
 export const executiveCatalog = mysqlTable("executiveCatalog", {
   id: int("id").autoincrement().primaryKey(),
   title: varchar("title", { length: 200 }).notNull(),
