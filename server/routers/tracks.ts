@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { analyzeTrackPackaging } from "../_core/packagingEngine";
 import {
   createTrack,
   deleteTrack,
@@ -13,7 +14,14 @@ const trackInput = z.object({
   title: z.string().min(1).max(200),
   artist: z.string().min(1).max(200).default("SGTB Music"),
   genre: z.string().max(120).optional().nullable(),
+  subGenre: z.string().max(120).optional().nullable(),
   bpm: z.number().int().min(20).max(400).optional().nullable(),
+  trackKey: z.string().max(30).optional().nullable(),
+  vibe: z.string().max(150).optional().nullable(),
+  dspPlacement: z.string().max(150).optional().nullable(),
+  lyrics: z.string().optional().nullable(),
+  aiPackagingEnabled: z.number().int().min(0).max(1).default(0),
+  virtualArtistsJson: z.string().optional().nullable(),
   audioUrl: z.string().min(1),
   audioKey: z.string().min(1).max(512),
   mimeType: z.string().max(128).optional().nullable(),
@@ -30,15 +38,37 @@ export const tracksRouter = router({
 
   create: adminProcedure.input(trackInput).mutation(async ({ input }) => {
     const nextOrder = (await getMaxTrackSortOrder()) + 1;
-    const id = await createTrack({ ...input, sortOrder: nextOrder, status: "approved" });
+    let finalInput = { ...input };
+    if (input.aiPackagingEnabled) {
+      const packaging = analyzeTrackPackaging(input.title, input.lyrics);
+      finalInput.genre = finalInput.genre || packaging.genre;
+      finalInput.subGenre = finalInput.subGenre || packaging.subGenre;
+      finalInput.bpm = finalInput.bpm || packaging.bpm;
+      finalInput.trackKey = finalInput.trackKey || packaging.trackKey;
+      finalInput.vibe = finalInput.vibe || packaging.vibe;
+      finalInput.dspPlacement = finalInput.dspPlacement || packaging.dspPlacement;
+      finalInput.virtualArtistsJson = finalInput.virtualArtistsJson || JSON.stringify(packaging.virtualArtists);
+    }
+    const id = await createTrack({ ...finalInput, sortOrder: nextOrder, status: "approved" });
     return { id };
   }),
 
   submit: protectedProcedure.input(trackInput).mutation(async ({ ctx, input }) => {
     const nextOrder = (await getMaxTrackSortOrder()) + 1;
+    let finalInput = { ...input };
+    if (input.aiPackagingEnabled) {
+      const packaging = analyzeTrackPackaging(input.title, input.lyrics);
+      finalInput.genre = finalInput.genre || packaging.genre;
+      finalInput.subGenre = finalInput.subGenre || packaging.subGenre;
+      finalInput.bpm = finalInput.bpm || packaging.bpm;
+      finalInput.trackKey = finalInput.trackKey || packaging.trackKey;
+      finalInput.vibe = finalInput.vibe || packaging.vibe;
+      finalInput.dspPlacement = finalInput.dspPlacement || packaging.dspPlacement;
+      finalInput.virtualArtistsJson = finalInput.virtualArtistsJson || JSON.stringify(packaging.virtualArtists);
+    }
     const isPrivileged = ctx.user.role === "admin" || ctx.user.role === "rep";
     const id = await createTrack({
-      ...input,
+      ...finalInput,
       sortOrder: nextOrder,
       status: isPrivileged ? "approved" : "pending",
       uploaderId: ctx.user.id,

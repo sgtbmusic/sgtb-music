@@ -121,3 +121,9 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Overwrite Suno Business copy with the four strategic pillars: AI A&R Engine, Blueprint Delivery System, Bridging the Gap, and The Showcase Label
 - [x] Overwrite About, Services, and Workflow sections to feature Vocal Realization work-for-hire sessions and Organic Interpolations
 - [x] Run type check and vitest test suite, then save and publish checkpoint with the updated copy
+
+- [x] Extend tracks schema and server procedures with packaging metadata, lyrics, and CSV export
+- [x] Build Smart Packaging Engine toggle, auto-transcription / lyric parser hook, and metadata tagger in TrackAdminPanel.tsx
+- [x] Build Persona Auto-Assigner widget for virtual artist generation in the upload form
+- [x] Build DDEX / DistroKid CSV export action in the track management table
+- [x] Verify build, run Vitest tests, and publish checkpoint

@@ -34,7 +34,14 @@ export const tracks = mysqlTable("tracks", {
   title: varchar("title", { length: 200 }).notNull(),
   artist: varchar("artist", { length: 200 }).default("SGTB Music").notNull(),
   genre: varchar("genre", { length: 120 }),
+  subGenre: varchar("subGenre", { length: 120 }),
   bpm: int("bpm"),
+  trackKey: varchar("trackKey", { length: 30 }),
+  vibe: varchar("vibe", { length: 150 }),
+  dspPlacement: varchar("dspPlacement", { length: 150 }),
+  lyrics: text("lyrics"),
+  aiPackagingEnabled: int("aiPackagingEnabled").default(0).notNull(),
+  virtualArtistsJson: text("virtualArtistsJson"),
   /** Public-facing audio URL served from storage, e.g. /manus-storage/{key} */
   audioUrl: text("audioUrl").notNull(),
   /** Storage key for the audio object. */

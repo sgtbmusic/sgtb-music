@@ -43,6 +43,13 @@
       "when": 1786640721886,
       "tag": "0005_mushy_metal_master",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1786672367189,
+      "tag": "0006_colorful_starfox",
+      "breakpoints": true
     }
   ]
 }
