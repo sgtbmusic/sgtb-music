@@ -161,3 +161,7 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Build account settings UI for custom avatar uploads and push notification opt-in toggle
 - [x] Build seasonal tournament history snapshots in Rewards.tsx
 - [x] Run type checks and tests, then save and publish checkpoint
+
+- [x] Add interactive 3-way Pre-Generation Pipeline Selector to the ExecutiveHQ End-to-End Workflow section
+- [x] Dynamically prepend Step 00: Audio Pipeline Initiation and update workflow content per selected mode
+- [x] Verify selector animation, responsive layout, type checks, tests, and publish checkpoint

@@ -8,6 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
 import { cn } from "@/lib/utils";
+import { PreGenerationPipelineSelector } from "@/components/PreGenerationPipelineSelector";
 import {
   ShieldCheck,
   Lock,
@@ -283,27 +284,7 @@ export default function ExecutiveHQ() {
                 <p className="mt-2 text-sm text-muted-foreground">Our proprietary studio architecture takes high-level Reference Demos through Analog Re-Tracking and delivers radio-ready masters for label and sync review.</p>
               </div>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-4">
-                {[
-                  { step: "01", name: "Raw Suno Draft", desc: "Initial text-to-audio prompt composition & seed curation" },
-                  { step: "02", name: "Stem Separation", desc: "Isolated vocal, drum, bass, and synth extraction" },
-                  { step: "03", name: "Pro Tools Hybrid Mix", desc: "Analog outboard processing, vocal tuning, & master bus" },
-                  { step: "04", name: "DistroKid Ingestion", desc: "Global streaming deployment & sync publishing" },
-                ].map((item, idx) => (
-                  <div key={item.step} className="rounded-2xl border border-gold/20 bg-gold/5 p-4 relative flex flex-col justify-between">
-                    <div>
-                      <span className="font-mono text-[10px] uppercase text-gold">{item.step}</span>
-                      <h4 className="font-display text-lg uppercase text-white mt-2">{item.name}</h4>
-                      <p className="mt-2 text-xs leading-5 text-muted-foreground">{item.desc}</p>
-                    </div>
-                    {idx < 3 && (
-                      <div className="hidden sm:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-gold">
-                        <ArrowRight className="size-4" />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+              <PreGenerationPipelineSelector />
             </div>
           </div>
         </section>
