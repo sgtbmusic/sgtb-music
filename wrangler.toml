@@ -1,0 +1,6 @@
+name = "sgtb-music"
+compatibility_date = "2026-08-15"
+pages_build_output_dir = "./dist/public"
+
+[build]
+command = "pnpm run build"
