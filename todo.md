@@ -167,3 +167,7 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Verify selector animation, responsive layout, type checks, tests, and publish checkpoint
 
 - [x] Complete production pipeline verification checklist: repository sync check with sgtbmusic/sgtb-music main branch, core feature validation (global persistent audio player & secure /admin/inbox), clean test build (pnpm build), and Vitest suite execution (26 tests passing)
+
+- [x] Clean GitHub main tree of non-source checkpoint artifacts and duplicate documentation files
+- [x] Create a clean source snapshot commit and force-push it to sgtbmusic/sgtb-music main
+- [x] Validate clean remote tree, production build, and tests after synchronization
