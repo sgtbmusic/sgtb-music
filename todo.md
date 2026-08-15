@@ -186,3 +186,5 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Add and deploy a minimal Worker proxy for `/api`, OAuth, and storage requests to the stable Manus backend
 - [x] Verify public-domain tRPC JSON, authenticated routing prerequisites, and custom-domain feature parity: API JSON and 403 role gate confirmed; public player and restricted inbox route verified
 - [x] Document that authenticated browser takeover is unavailable; unauthenticated verification (static frontend, global audio player, and owner inbox 403 access gate) is fully confirmed on `sgtbmusicgroup.com`
+
+- [x] Extract 42 individual visual DNA assets from the two collage screenshots into `SGTB_Visual_DNA_Archive` and package into `SGTB_Visual_DNA_Archive.zip`
