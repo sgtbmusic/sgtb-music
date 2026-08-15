@@ -173,3 +173,10 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Validate clean remote tree, production build, and tests after synchronization
 
 - [x] Add root wrangler.toml for Cloudflare Pages build output at dist/public and push the deployment configuration to GitHub main
+
+- [ ] Add a Cloudflare Workers/serverless backend adapter compatible with the SGTB tRPC API or document the Node-runtime boundary
+- [ ] Verify the latest Cloudflare Pages deployment and exercise the global audio player and owner inbox against the active runtime
+
+- [ ] Simplify Cloudflare deployment to standard static SPA routing and remove the complex backend adapter
+- [ ] Validate isolated static build output and push the corrected configuration to GitHub main
+- [ ] Poll sgtbmusicgroup.com over HTTP and record whether it matches the current build or remains stale
