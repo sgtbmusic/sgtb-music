@@ -1,6 +1,9 @@
-name = "sgtb-music"
+name = "sgtbmusic"
 compatibility_date = "2026-08-15"
-pages_build_output_dir = "./dist/public"
+
+[assets]
+directory = "./dist/public"
+not_found_handling = "single-page-application"
 
 [build]
 command = "pnpm run build"
