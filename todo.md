@@ -172,4 +172,4 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Create a clean source snapshot commit and force-push it to sgtbmusic/sgtb-music main
 - [x] Validate clean remote tree, production build, and tests after synchronization
 
-- [ ] Add root wrangler.toml for Cloudflare Pages build output at dist/public and push the deployment configuration to GitHub main
+- [x] Add root wrangler.toml for Cloudflare Pages build output at dist/public and push the deployment configuration to GitHub main
