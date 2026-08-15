@@ -1,9 +1,13 @@
 name = "sgtbmusic"
 compatibility_date = "2026-08-15"
+main = "worker.js"
 
 [assets]
 directory = "./dist/public"
 not_found_handling = "single-page-application"
+
+[vars]
+BACKEND_ORIGIN = "https://sgtbmusic-pbepc3kz.manus.space"
 
 [build]
 command = "pnpm run build"

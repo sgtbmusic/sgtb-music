@@ -181,4 +181,7 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Validate isolated static build output and push the corrected configuration to GitHub main
 - [x] Poll sgtbmusicgroup.com over HTTP and record whether it matches the current build or remains stale: domain is 200/no-522 but still serves old asset hashes and legacy copy
 
-- [ ] Align Wrangler with the existing Cloudflare Workers project, validate the deployment build, and verify sgtbmusicgroup.com parity
+- [x] Align Wrangler with the existing Cloudflare Workers project, validate the deployment build, and verify sgtbmusicgroup.com parity: static frontend is live on Cloudflare; `/api/trpc` still requires the Node/Manus backend
+
+- [ ] Add and deploy a minimal Worker proxy for `/api`, OAuth, and storage requests to the stable Manus backend
+- [ ] Verify public-domain tRPC JSON, authenticated routing prerequisites, and custom-domain feature parity
