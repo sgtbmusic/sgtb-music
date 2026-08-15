@@ -174,9 +174,9 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 
 - [x] Add root wrangler.toml for Cloudflare Pages build output at dist/public and push the deployment configuration to GitHub main
 
-- [ ] Add a Cloudflare Workers/serverless backend adapter compatible with the SGTB tRPC API or document the Node-runtime boundary
-- [ ] Verify the latest Cloudflare Pages deployment and exercise the global audio player and owner inbox against the active runtime
+- [x] Document the Node-runtime boundary; Cloudflare Workers/serverless adapter intentionally halted by user directive
+- [x] Check latest public-domain HTTP behavior; audio player and owner inbox cannot be confirmed on the custom domain until Cloudflare serves the current frontend
 
-- [ ] Simplify Cloudflare deployment to standard static SPA routing and remove the complex backend adapter
-- [ ] Validate isolated static build output and push the corrected configuration to GitHub main
-- [ ] Poll sgtbmusicgroup.com over HTTP and record whether it matches the current build or remains stale
+- [x] Simplify Cloudflare deployment to standard static SPA routing and remove the complex backend adapter
+- [x] Validate isolated static build output and push the corrected configuration to GitHub main
+- [x] Poll sgtbmusicgroup.com over HTTP and record whether it matches the current build or remains stale: domain is 200/no-522 but still serves old asset hashes and legacy copy
