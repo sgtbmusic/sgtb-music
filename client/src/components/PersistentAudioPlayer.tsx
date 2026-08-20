@@ -62,7 +62,19 @@ export function PersistentAudioPlayer() {
     setPlaying(true);
   };
 
-  if (!current) return null;
+  if (!current) {
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gold/25 bg-[#0d0a06]/95 px-4 py-3 text-foreground shadow-[0_-10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+        <div className="container mx-auto flex max-w-7xl items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="grid size-10 shrink-0 place-items-center rounded-xl border border-gold/30 bg-gold/5 text-gold"><Music2 className="size-5" /></div>
+            <div className="min-w-0"><p className="font-display text-sm uppercase tracking-wider text-white">SGTB Master Feed</p><p className="truncate font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Choose a catalog track to begin playback</p></div>
+          </div>
+          <span className="hidden rounded-full border border-neon/20 bg-neon/5 px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-neon sm:inline-flex"><span className="mr-2 size-1.5 self-center rounded-full bg-neon" /> Ready</span>
+        </div>
+      </div>
+    );
+  }
 
   const template = coverTemplate(current.id);
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;

@@ -1,4 +1,4 @@
-import { asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   contactMessages,
@@ -19,6 +19,11 @@ import {
   userRewards,
   UserReward,
   InsertUserReward,
+  directMessages,
+  socialPosts,
+  socialPostComments,
+  socialPostLikes,
+  InsertSocialPost,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -326,12 +331,84 @@ export async function listPastTournaments() {
   return db.select().from(cadenceTournaments).orderBy(desc(cadenceTournaments.endedAt));
 }
 
-export async function updateUserAvatarAndPush(userId: number, avatarUrl?: string, pushEnabled?: number) {
+export async function updateUserProfile(
+  userId: number,
+  updates: Partial<{
+    name: string | null;
+    username: string | null;
+    bio: string | null;
+    avatarUrl: string | null;
+    websiteUrl: string | null;
+    socialLinksJson: string | null;
+    emailUpdatesEnabled: number;
+    pushEnabled: number;
+  }>,
+) {
   const db = await getDb();
-  if (!db) return;
-  const updates: Record<string, any> = {};
+  if (!db || Object.keys(updates).length === 0) return;
+  await db.update(users).set(updates).where(eq(users.id, userId));
+}
+
+export async function updateUserAvatarAndPush(userId: number, avatarUrl?: string, pushEnabled?: number) {
+  const updates: Parameters<typeof updateUserProfile>[1] = {};
   if (avatarUrl !== undefined) updates.avatarUrl = avatarUrl;
   if (pushEnabled !== undefined) updates.pushEnabled = pushEnabled;
-  if (Object.keys(updates).length === 0) return;
-  await db.update(users).set(updates).where(eq(users.id, userId));
+  await updateUserProfile(userId, updates);
+}
+
+export async function listSocialPosts(limit = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({ post: socialPosts, author: users })
+    .from(socialPosts)
+    .leftJoin(users, eq(socialPosts.authorId, users.id))
+    .orderBy(desc(socialPosts.createdAt))
+    .limit(limit);
+}
+
+export async function createSocialPost(input: InsertSocialPost) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.insert(socialPosts).values(input);
+  const id = Number(result[0].insertId);
+  return db.select().from(socialPosts).where(eq(socialPosts.id, id)).limit(1).then((rows) => rows[0] ?? null);
+}
+
+export async function toggleSocialPostLike(postId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return { liked: false };
+  const existing = await db.select().from(socialPostLikes).where(and(eq(socialPostLikes.postId, postId), eq(socialPostLikes.userId, userId))).limit(1);
+  if (existing.length > 0) {
+    await db.delete(socialPostLikes).where(eq(socialPostLikes.id, existing[0].id));
+    await db.update(socialPosts).set({ likesCount: Math.max(0, (await db.select({ count: socialPosts.likesCount }).from(socialPosts).where(eq(socialPosts.id, postId)).then((rows) => rows[0]?.count ?? 1)) - 1) }).where(eq(socialPosts.id, postId));
+    return { liked: false };
+  }
+  await db.insert(socialPostLikes).values({ postId, userId });
+  const current = await db.select({ count: socialPosts.likesCount }).from(socialPosts).where(eq(socialPosts.id, postId));
+  await db.update(socialPosts).set({ likesCount: (current[0]?.count ?? 0) + 1 }).where(eq(socialPosts.id, postId));
+  return { liked: true };
+}
+
+export async function addSocialPostComment(postId: number, authorId: number, body: string) {
+  const db = await getDb();
+  if (!db) return null;
+  await db.insert(socialPostComments).values({ postId, authorId, body });
+  const current = await db.select({ count: socialPosts.commentsCount }).from(socialPosts).where(eq(socialPosts.id, postId));
+  await db.update(socialPosts).set({ commentsCount: (current[0]?.count ?? 0) + 1 }).where(eq(socialPosts.id, postId));
+  return { success: true } as const;
+}
+
+export async function listDirectMessages(userId: number, otherUserId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({ message: directMessages, sender: users }).from(directMessages).leftJoin(users, eq(directMessages.senderId, users.id)).where(or(and(eq(directMessages.senderId, userId), eq(directMessages.recipientId, otherUserId)), and(eq(directMessages.senderId, otherUserId), eq(directMessages.recipientId, userId)))).orderBy(asc(directMessages.createdAt));
+}
+
+export async function sendDirectMessage(senderId: number, recipientId: number, body: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.insert(directMessages).values({ senderId, recipientId, body });
+  const id = Number(result[0].insertId);
+  return db.select().from(directMessages).where(eq(directMessages.id, id)).limit(1).then((rows) => rows[0] ?? null);
 }

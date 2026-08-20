@@ -3,7 +3,11 @@ export const BRAND = "SGTB Music";
 export const ROSIE_IMAGE = "/manus-storage/rosie-nguyen_32cbb9fe.jpeg";
 
 export const NAV_LINKS = [
-  { href: "/home", label: "Home" },
+  { href: "/", label: "Feed" },
+  { href: "/explore", label: "Explore" },
+  { href: "/upload", label: "Upload" },
+  { href: "/messages", label: "Messages" },
+  { href: "/profile", label: "Profile" },
   { href: "/music", label: "Catalog" },
   { href: "/rewards", label: "Rewards" },
   { href: "/about", label: "About" },

@@ -20,18 +20,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const ORGANIZED_NAV = [
-  { label: "Home", href: "/home" },
-  { label: "Catalog", href: "/music" },
+  { label: "Feed", href: "/" },
+  { label: "Explore", href: "/explore" },
+  { label: "Upload", href: "/upload" },
+  { label: "DMs", href: "/messages" },
+  { label: "Music", href: "/music" },
   { label: "Vault", href: "/visuals" },
-  { label: "Draft Pool", href: "/artist-draft-pool" },
-  { label: "Executive HQ", href: "/suno-hq" },
-  { label: "About", href: "/about" },
-  { label: "Services", href: "/services" },
-  { label: "Contact", href: "/contact" },
+  { label: "Drafts", href: "/artist-draft-pool" },
+  { label: "Suno", href: "/suno" },
 ];
 
 function isActive(pathname: string, href: string) {
-  if (href === "/home") return pathname === "/" || pathname === "/home";
+  if (href === "/") return pathname === "/";
+  if (href === "/home") return pathname === "/home";
   return pathname === href;
 }
 
@@ -65,7 +66,7 @@ export function SiteNav() {
           : "border-transparent bg-background/40 backdrop-blur-sm",
       )}>
       <div className="container flex h-16 items-center justify-between gap-3">
-        <Link href="/home" className="shrink-0" aria-label="SGTB Music home">
+        <Link href="/" className="shrink-0" aria-label="SGTB Music home">
           <BrandMark />
         </Link>
 

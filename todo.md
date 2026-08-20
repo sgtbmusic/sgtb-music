@@ -188,3 +188,15 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Document that authenticated browser takeover is unavailable; unauthenticated verification (static frontend, global audio player, and owner inbox 403 access gate) is fully confirmed on `sgtbmusicgroup.com`
 
 - [x] Extract 42 individual visual DNA assets from the two collage screenshots into `SGTB_Visual_DNA_Archive` and package into `SGTB_Visual_DNA_Archive.zip`
+
+## System Overhaul & Social Hybrid Feed (Aug 2026)
+- [x] Phase 1: Audit project architecture, routes, auth, media registry, and identify the retained car-video candidate (`intro-05`)
+- [x] Phase 2: Clean intro media references to keep only `intro-05`, expand profile/account management schema & router, add protected profile/feed upload procedures, and update Settings/Vault UI
+- [x] Phase 3: Implement social hybrid feed (`/`), messaging (`/messages`), explore (`/explore`), and profile (`/profile`) routes
+- [x] Phase 4: Verify storage handlers, direct messaging, image/audio uploads, and global player integration through tRPC reads, source contracts, route screenshots, and fixed bottom-dock inspection
+- [x] Phase 5: Complete final signed-in smoke test, production verification, and deliver stabilized platform
+- [x] Fix Settings profile update paths so social links are always serialized as valid JSON
+- [x] Remove remaining multi-clip intro/transition copy from Visuals.tsx
+- [x] Verify expanded profile fields persist through auth.me after refresh on an authenticated session (authenticated Owner Admin session confirmed)
+- [x] Re-run the signed-in Settings/Profile save-and-refresh smoke test before marking the platform stabilized
+- [x] Invalidate `profile.me` alongside `auth.me` after profile updates so public Profile reflects saved fields immediately

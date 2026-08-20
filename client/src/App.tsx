@@ -19,12 +19,20 @@ import AdminPortal from "@/pages/AdminPortal";
 import AdminInbox from "@/pages/AdminInbox";
 import Rewards from "@/pages/Rewards";
 import { PersistentAudioPlayer } from "@/components/PersistentAudioPlayer";
+import SocialFeed from "./pages/SocialFeed";
+import Messages from "./pages/Messages";
+import Profile from "./pages/Profile";
+import Explore from "./pages/Explore";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      <Route path="/" component={SocialFeed} />
       <Route path="/home" component={Home} />
+      <Route path="/upload" component={SocialFeed} />
+      <Route path="/messages" component={Messages} />
+      <Route path="/profile" component={Profile} />
+      <Route path="/explore" component={Explore} />
       <Route path="/about" component={About} />
       <Route path="/artist-draft-pool" component={ArtistDraftPool} />
       <Route path="/services" component={Services} />
@@ -37,6 +45,7 @@ function Router() {
       <Route path={"/admin/inbox"} component={AdminInbox} />
       <Route path="/contact" component={Contact} />
       <Route path="/rewards" component={Rewards} />
+      <Route path="/settings" component={Settings} />
       <Route path="/404" component={NotFound} />
       {/* Legacy/alias paths keep deep links working */}
       <Route path="/suno-business">{() => <Redirect to="/suno" />}</Route>

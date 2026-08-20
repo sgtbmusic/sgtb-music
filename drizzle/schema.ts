@@ -18,6 +18,11 @@ export const users = mysqlTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "rep", "admin"]).default("user").notNull(),
   avatarUrl: text("avatarUrl"),
+  username: varchar("username", { length: 80 }).unique(),
+  bio: text("bio"),
+  websiteUrl: varchar("websiteUrl", { length: 512 }),
+  socialLinksJson: text("socialLinksJson"),
+  emailUpdatesEnabled: int("emailUpdatesEnabled").default(1).notNull(),
   pushEnabled: int("pushEnabled").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -26,6 +31,47 @@ export const users = mysqlTable("users", {
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+
+export const socialPosts = mysqlTable("social_posts", {
+  id: int("id").autoincrement().primaryKey(),
+  authorId: int("authorId").notNull(),
+  body: text("body").notNull(),
+  mediaUrl: text("mediaUrl"),
+  mediaType: mysqlEnum("mediaType", ["image", "audio"]),
+  mediaTitle: varchar("mediaTitle", { length: 200 }),
+  likesCount: int("likesCount").default(0).notNull(),
+  commentsCount: int("commentsCount").default(0).notNull(),
+  repostsCount: int("repostsCount").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SocialPost = typeof socialPosts.$inferSelect;
+export type InsertSocialPost = typeof socialPosts.$inferInsert;
+
+export const socialPostLikes = mysqlTable("social_post_likes", {
+  id: int("id").autoincrement().primaryKey(),
+  postId: int("postId").notNull(),
+  userId: int("userId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const socialPostComments = mysqlTable("social_post_comments", {
+  id: int("id").autoincrement().primaryKey(),
+  postId: int("postId").notNull(),
+  authorId: int("authorId").notNull(),
+  body: text("body").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const directMessages = mysqlTable("direct_messages", {
+  id: int("id").autoincrement().primaryKey(),
+  senderId: int("senderId").notNull(),
+  recipientId: int("recipientId").notNull(),
+  body: text("body").notNull(),
+  readAt: timestamp("readAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
 
 /**
  * Music catalog powering the BeatStars-style player on /music.

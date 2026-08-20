@@ -9,6 +9,9 @@ import { creatorsRouter } from "./routers/creators";
 import { tracksRouter } from "./routers/tracks";
 import { uploadsRouter } from "./routers/uploads";
 import { rewardsRouter } from "./routers/rewards";
+import { profileRouter } from "./routers/profile";
+import { socialRouter } from "./routers/social";
+import { messagesRouter } from "./routers/messages";
 
 export const appRouter = router({
   system: systemRouter,
@@ -25,6 +28,9 @@ export const appRouter = router({
   sunoEpisodes: sunoEpisodesRouter,
   executive: executiveRouter,
   rewards: rewardsRouter,
+  profile: profileRouter,
+  social: socialRouter,
+  messages: messagesRouter,
   tracks: tracksRouter,
   creators: creatorsRouter,
   uploads: uploadsRouter,

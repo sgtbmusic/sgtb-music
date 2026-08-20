@@ -64,6 +64,20 @@
       "when": 1786677292450,
       "tag": "0008_flaky_eternity",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1787230083446,
+      "tag": "0009_material_reaper",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1787230481511,
+      "tag": "0010_rare_red_hulk",
+      "breakpoints": true
     }
   ]
 }

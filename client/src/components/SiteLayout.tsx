@@ -29,7 +29,7 @@ export function SiteLayout({ children, variant = "default" }: SiteLayoutProps) {
       )}
       <SiteNav />
       <OnboardingGuide />
-      <main className="flex-1">
+      <main className="flex-1 pb-20">
         <div className="sgtb-page-enter">{children}</div>
       </main>
       <SiteFooter />

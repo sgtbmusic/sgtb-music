@@ -2,29 +2,84 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { getPlayIntroOnLogin, requestIntroReplay, setPlayIntroOnLogin } from "@/lib/gatewayPreferences";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ArrowLeft, Check, PlayCircle, Settings2, ShieldCheck, User, Sparkles, LogOut, Lock, Camera, Volume2, Upload } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { startLogin } from "@/const";
 import { toast } from "sonner";
+
+function serializeSocialLinks(input: string) {
+  return JSON.stringify(
+    input
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const separator = line.indexOf(":");
+        return separator > 0
+          ? { label: line.slice(0, separator).trim(), url: line.slice(separator + 1).trim() }
+          : { label: "Link", url: line };
+      }),
+  );
+}
 
 export default function Settings() {
   const { user, isAuthenticated, logout } = useAuth();
   const [playIntroOnLogin, setPlayIntro] = useState(() => getPlayIntroOnLogin());
   const [avatarInput, setAvatarInput] = useState(user?.avatarUrl || "");
+  const [nameInput, setNameInput] = useState(user?.name || "");
+  const [usernameInput, setUsernameInput] = useState(user?.username || "");
+  const [bioInput, setBioInput] = useState(user?.bio || "");
+  const [websiteInput, setWebsiteInput] = useState(user?.websiteUrl || "");
+  const [linksInput, setLinksInput] = useState(() => {
+    try {
+      const parsed = user?.socialLinksJson ? JSON.parse(user.socialLinksJson) : [];
+      return Array.isArray(parsed) ? parsed.map((link: { label?: string; url?: string }) => `${link.label || "Link"}: ${link.url || ""}`).join("\\n") : "";
+    } catch {
+      return "";
+    }
+  });
+  const [emailUpdatesEnabled, setEmailUpdatesEnabled] = useState(user?.emailUpdatesEnabled !== 0);
   const [pushEnabled, setPushEnabled] = useState(Boolean(user?.pushEnabled));
 
+  useEffect(() => {
+    if (!user) return;
+    setAvatarInput(user.avatarUrl || "");
+    setNameInput(user.name || "");
+    setUsernameInput(user.username || "");
+    setBioInput(user.bio || "");
+    setWebsiteInput(user.websiteUrl || "");
+    setEmailUpdatesEnabled(user.emailUpdatesEnabled !== 0);
+    setPushEnabled(Boolean(user.pushEnabled));
+    try {
+      const links = user.socialLinksJson ? JSON.parse(user.socialLinksJson) : [];
+      setLinksInput(Array.isArray(links) ? links.map((link: { label?: string; url?: string }) => `${link.label || "Link"}: ${link.url || ""}`).join("\n") : "");
+    } catch {
+      setLinksInput("");
+    }
+  }, [user]);
+
   const utils = trpc.useUtils();
-  const uploadMutation = trpc.uploads.image.useMutation({
+  const uploadMutation = trpc.uploads.profileImage.useMutation({
     onSuccess: (data) => {
       if (data?.url) {
         setAvatarInput(data.url);
-        updateProfileMutation.mutate({ avatarUrl: data.url, pushEnabled: pushEnabled ? 1 : 0 });
-        toast.success("Avatar image uploaded to S3 successfully!");
+        updateProfileMutation.mutate({
+          avatarUrl: data.url,
+          name: nameInput,
+          username: usernameInput,
+          bio: bioInput,
+          websiteUrl: websiteInput,
+          socialLinksJson: serializeSocialLinks(linksInput),
+          emailUpdatesEnabled: emailUpdatesEnabled ? 1 : 0,
+          pushEnabled: pushEnabled ? 1 : 0,
+        });
+        toast.success("Avatar image uploaded successfully!");
       }
     },
     onError: (err) => {
@@ -32,9 +87,10 @@ export default function Settings() {
     },
   });
 
-  const updateProfileMutation = trpc.rewards.updateProfile.useMutation({
+  const updateProfileMutation = trpc.profile.update.useMutation({
     onSuccess: () => {
       utils.auth.me.invalidate();
+      utils.profile.me.invalidate();
       toast.success("Profile updated successfully!");
     },
     onError: (err) => {
@@ -65,9 +121,18 @@ export default function Settings() {
     setPlayIntroOnLogin(enabled);
   }
 
-  const handleSaveAvatar = (e: React.FormEvent) => {
+  const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfileMutation.mutate({ avatarUrl: avatarInput, pushEnabled: pushEnabled ? 1 : 0 });
+    updateProfileMutation.mutate({
+      avatarUrl: avatarInput || null,
+      name: nameInput || null,
+      username: usernameInput || null,
+      bio: bioInput || null,
+      websiteUrl: websiteInput || null,
+      socialLinksJson: serializeSocialLinks(linksInput),
+      emailUpdatesEnabled: emailUpdatesEnabled ? 1 : 0,
+      pushEnabled: pushEnabled ? 1 : 0,
+    });
   };
 
   const handlePushToggle = (checked: boolean) => {
@@ -147,7 +212,31 @@ export default function Settings() {
         {isAuthenticated && (
           <section className="glass-panel mb-8 rounded-3xl border border-white/10 p-6 sm:p-8">
             <h2 className="font-display text-2xl uppercase text-white">Profile Customization & Alerts</h2>
-            <form onSubmit={handleSaveAvatar} className="mt-6 space-y-6">
+            <form onSubmit={handleSaveProfile} className="mt-6 space-y-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="profile-name" className="font-mono text-xs uppercase text-gold">Display Name</Label>
+                  <Input id="profile-name" value={nameInput} onChange={(e) => setNameInput(e.target.value)} placeholder="Your public display name" className="mt-2 bg-black/40 border-white/10 text-white" />
+                </div>
+                <div>
+                  <Label htmlFor="profile-username" className="font-mono text-xs uppercase text-gold">Username</Label>
+                  <Input id="profile-username" value={usernameInput} onChange={(e) => setUsernameInput(e.target.value.replace(/\\s/g, "").toLowerCase())} placeholder="sgtb_creator" className="mt-2 bg-black/40 border-white/10 text-white" />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="profile-bio" className="font-mono text-xs uppercase text-gold">Bio</Label>
+                <Textarea id="profile-bio" value={bioInput} onChange={(e) => setBioInput(e.target.value)} placeholder="Tell the network what you make." className="mt-2 min-h-24 bg-black/40 border-white/10 text-white" />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="profile-website" className="font-mono text-xs uppercase text-gold">Website</Label>
+                  <Input id="profile-website" value={websiteInput} onChange={(e) => setWebsiteInput(e.target.value)} placeholder="https://" className="mt-2 bg-black/40 border-white/10 text-white" />
+                </div>
+                <div>
+                  <Label htmlFor="profile-links" className="font-mono text-xs uppercase text-gold">Social Links</Label>
+                  <Textarea id="profile-links" value={linksInput} onChange={(e) => setLinksInput(e.target.value)} placeholder="Instagram: https://...\\nX: https://..." className="mt-2 min-h-24 bg-black/40 border-white/10 text-white" />
+                </div>
+              </div>
               <div>
                 <Label htmlFor="avatar-url" className="font-mono text-xs uppercase text-gold">Custom Profile Avatar</Label>
                 <div className="mt-2 flex flex-col sm:flex-row gap-3">
@@ -164,11 +253,19 @@ export default function Settings() {
                       <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                     </label>
                     <Button type="submit" disabled={uploadMutation.isPending} className="bg-gold text-black hover:bg-gold/90 font-mono text-xs">
-                      {uploadMutation.isPending ? "Uploading..." : "Save Avatar"}
+                      {uploadMutation.isPending ? "Uploading..." : "Save Profile"}
                     </Button>
                   </div>
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-1.5">Upload a profile picture or provide an S3 storage URL to display your avatar across the platform and leaderboard.</p>
+                <p className="text-[11px] text-muted-foreground mt-1.5">Upload a profile picture or provide an S3 storage URL to display your avatar across the platform and leaderboard. Saving this form persists your display name, username, bio, website, and social links.</p>
+              </div>
+
+              <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+                <div>
+                  <h5 className="font-display text-base text-white">Email Updates</h5>
+                  <p className="text-xs text-muted-foreground">Receive account and platform updates at {user?.email || "your OAuth email"}. Email identity remains managed by Manus OAuth.</p>
+                </div>
+                <Switch checked={emailUpdatesEnabled} onCheckedChange={setEmailUpdatesEnabled} />
               </div>
 
               <div className="pt-4 border-t border-white/10 flex items-center justify-between">
@@ -237,7 +334,7 @@ export default function Settings() {
         {/* Cinematic Gateway Preferences */}
         <section className="glass-panel rounded-3xl border border-white/10 p-6 sm:p-8">
           <h2 className="font-display text-2xl uppercase text-white">Cinematic Gateway Preferences</h2>
-          <p className="mt-2 text-xs text-muted-foreground">Configure whether the click-to-enter video splash plays automatically when you open the site.</p>
+          <p className="mt-2 text-xs text-muted-foreground">Configure whether the retained SGTB car sequence plays automatically when you open the site.</p>
           
           <div className="mt-6 space-y-6">
             <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/40 p-5">
@@ -255,7 +352,7 @@ export default function Settings() {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/40 p-5">
               <div>
                 <h3 className="font-display text-lg text-white">Manual Gateway Replay</h3>
-                <p className="text-xs text-muted-foreground mt-1">Replay the full two-stage randomized video intro right now with audio.</p>
+                <p className="text-xs text-muted-foreground mt-1">Replay the retained SGTB car sequence right now with audio.</p>
               </div>
               <Button
                 type="button"

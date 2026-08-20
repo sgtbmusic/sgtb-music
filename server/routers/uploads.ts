@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { storagePut } from "../storage";
-import { adminProcedure, router } from "../_core/trpc";
+import { adminProcedure, protectedProcedure, router } from "../_core/trpc";
 
 /** 60MB ceiling keeps WAV uploads workable while protecting the request budget. */
 const MAX_BYTES = 60 * 1024 * 1024;
@@ -61,6 +61,69 @@ export const uploadsRouter = router({
       const buffer = decodeBase64(input.dataBase64);
       return storagePut(
         `sgtb/audio/${sanitizeName(input.fileName)}`,
+        buffer,
+        input.contentType,
+      );
+    }),
+
+  /** Uploads a user avatar through the protected account flow. */
+  profileImage: protectedProcedure
+    .input(
+      z.object({
+        fileName: z.string().min(1).max(200),
+        contentType: z.string().min(1).max(128),
+        dataBase64: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!IMAGE_TYPES.includes(input.contentType.toLowerCase())) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Only PNG, JPEG, WEBP, or AVIF images are supported." });
+      }
+      const buffer = decodeBase64(input.dataBase64);
+      return storagePut(
+        `sgtb/users/${ctx.user.id}/avatar-${sanitizeName(input.fileName)}`,
+        buffer,
+        input.contentType,
+      );
+    }),
+
+  /** Uploads an image for a social feed post through the protected member flow. */
+  feedImage: protectedProcedure
+    .input(
+      z.object({
+        fileName: z.string().min(1).max(200),
+        contentType: z.string().min(1).max(128),
+        dataBase64: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!IMAGE_TYPES.includes(input.contentType.toLowerCase())) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Only PNG, JPEG, WEBP, or AVIF images are supported." });
+      }
+      const buffer = decodeBase64(input.dataBase64);
+      return storagePut(
+        `sgtb/feed/${ctx.user.id}/${sanitizeName(input.fileName)}`,
+        buffer,
+        input.contentType,
+      );
+    }),
+
+  /** Uploads an MP3 for a protected social feed post. */
+  feedAudio: protectedProcedure
+    .input(
+      z.object({
+        fileName: z.string().min(1).max(200),
+        contentType: z.string().min(1).max(128),
+        dataBase64: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!AUDIO_TYPES.includes(input.contentType.toLowerCase())) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Only MP3 and WAV audio files are supported." });
+      }
+      const buffer = decodeBase64(input.dataBase64);
+      return storagePut(
+        `sgtb/feed/${ctx.user.id}/${sanitizeName(input.fileName)}`,
         buffer,
         input.contentType,
       );

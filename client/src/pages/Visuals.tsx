@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/PageHeader";
 import { SiteLayout } from "@/components/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { INTRO_CLIPS, TRANSITION_CLIPS, type IntroClip } from "@/lib/introMedia";
+import { CAR_INTRO_CLIP, type IntroClip } from "@/lib/introMedia";
 import { ArrowUpRight, Film, Play, Sparkles } from "lucide-react";
 
 function ClipCard({ clip, index, family }: { clip: IntroClip; index: number; family: "intro" | "transition" }) {
@@ -62,7 +62,7 @@ export default function Visuals() {
           eyebrow="Cinematic Vault / On demand"
           title="The Visuals vault."
           accent="Visuals"
-          description="Every entry frame, transition beat, and gold-dust handoff is now available to preview on demand. Press play when you want the signal—not only when you enter."
+          description="The retained SGTB car-and-chain sequence is available to preview on demand. Press play when you want the signal—not only when you enter."
         />
 
         <div className="mt-10 grid gap-5 lg:grid-cols-[1.35fr_0.65fr]">
@@ -73,8 +73,8 @@ export default function Visuals() {
               </div>
               <div>
                 <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-gold-soft">Vault protocol</p>
-                <h2 className="mt-2 font-display text-3xl uppercase leading-none text-white">Ten cuts. One frequency.</h2>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">The entry gateway chooses one intro and one transition at random. Here, you control the sequence—use each player to inspect the visual language, timing, and atmosphere of the full SGTB Records experience.</p>
+                <h2 className="mt-2 font-display text-3xl uppercase leading-none text-white">One retained signal.</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">The gateway now uses one primary visual asset: the SGTB architect in the car wearing the chain. Preview it on demand here without autoplay or randomized cuts.</p>
               </div>
             </div>
           </div>
@@ -88,18 +88,11 @@ export default function Visuals() {
         </div>
 
         <ClipSection
-          eyebrow="Sequence 01"
-          title="Intro cuts"
-          description="The five opening clips used when a visitor chooses to enter SGTB Records. Each player is manual and does not autoplay."
-          clips={INTRO_CLIPS}
+          eyebrow="Primary sequence"
+          title="The SGTB car sequence"
+          description="The retained SGTB chain visual is available for manual review and powers the entry gateway."
+          clips={[CAR_INTRO_CLIP]}
           family="intro"
-        />
-        <ClipSection
-          eyebrow="Sequence 02"
-          title="Transition cuts"
-          description="The five handoff clips that move the experience from cinematic entry into the access terminal."
-          clips={TRANSITION_CLIPS}
-          family="transition"
         />
       </div>
     </SiteLayout>

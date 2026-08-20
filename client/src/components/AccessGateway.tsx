@@ -16,19 +16,14 @@ import {
 } from "lucide-react";
 import { type FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import {
-  chooseRandomClip,
-  INTRO_CLIPS,
-  TRANSITION_CLIPS,
-  type IntroClip,
-} from "@/lib/introMedia";
+import { CAR_INTRO_CLIP, type IntroClip } from "@/lib/introMedia";
 import { getPlayIntroOnLogin, INTRO_REPLAY_EVENT } from "@/lib/gatewayPreferences";
 
 const INTRO_SEEN_KEY = "sgtb-records-intro-seen";
 const AUTH_INTENT_KEY = "sgtb-records-auth-intent";
 const ACCESS_MODE_KEY = "sgtb-records-access-mode";
 
-type GatewayPhase = "splash" | "intro" | "transition" | "login";
+type GatewayPhase = "splash" | "intro" | "login";
 type AuthIntent = "standard" | "rosie";
 
 type AccessGatewayProps = {
@@ -79,17 +74,15 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
   const [isStarting, setIsStarting] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [activeClip, setActiveClip] = useState<IntroClip | null>(null);
-  const [transitionClip, setTransitionClip] = useState<IntroClip | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const showVideo = phase === "intro" || phase === "transition";
-  const currentClip = phase === "intro" ? activeClip : transitionClip;
+  const showVideo = phase === "intro";
+  const currentClip = activeClip;
   const isOwner = user?.role === "admin";
 
   const phaseLabel = useMemo(() => {
-    if (phase === "intro") return "Opening the vault";
-    if (phase === "transition") return "Unlocking the next frequency";
+    if (phase === "intro") return "Opening the retained car sequence";
     return "SGTB Records access terminal";
   }, [phase]);
 
@@ -106,12 +99,7 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
     }
 
     const fallbackTimer = window.setTimeout(() => {
-      if (phase === "intro") {
-        setTransitionClip(chooseRandomClip(TRANSITION_CLIPS));
-        setPhase("transition");
-      } else {
-        revealLogin();
-      }
+      revealLogin();
     }, 7800);
 
     return () => window.clearTimeout(fallbackTimer);
@@ -121,12 +109,7 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
     if (!mediaError || !showVideo) return;
 
     const errorTimer = window.setTimeout(() => {
-      if (phase === "intro") {
-        setTransitionClip(chooseRandomClip(TRANSITION_CLIPS));
-        setPhase("transition");
-      } else {
-        revealLogin();
-      }
+      revealLogin();
     }, 650);
 
     return () => window.clearTimeout(errorTimer);
@@ -148,7 +131,7 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
       return;
     }
 
-    closeGateway("/artist-draft-pool");
+    closeGateway("/");
   }, [authIntent, isAuthenticated, isOwner, loading, phase, visible]);
 
   useEffect(() => {
@@ -158,8 +141,7 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
       setIsExiting(false);
       setMediaError(false);
       setNotice(null);
-      setActiveClip(chooseRandomClip(INTRO_CLIPS));
-      setTransitionClip(chooseRandomClip(TRANSITION_CLIPS));
+      setActiveClip(CAR_INTRO_CLIP);
       setPhase("intro");
     };
 
@@ -174,18 +156,12 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
     if (isStarting) return;
     setIsStarting(true);
     writeSession("sgtb-records-entry-interacted", "true");
-    setActiveClip(chooseRandomClip(INTRO_CLIPS));
-    setTransitionClip(chooseRandomClip(TRANSITION_CLIPS));
+    setActiveClip(CAR_INTRO_CLIP);
     setPhase("intro");
     setIsStarting(false);
   }
 
   function handleVideoEnd() {
-    if (phase === "intro") {
-      setTransitionClip(chooseRandomClip(TRANSITION_CLIPS));
-      setPhase("transition");
-      return;
-    }
     revealLogin();
   }
 
@@ -204,7 +180,7 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
     }, 620);
   }
 
-  function closeGateway(destination: "/artist-draft-pool" | "/suno") {
+  function closeGateway(destination: "/" | "/suno") {
     if (!visible || revealTimerRef.current) return;
     writeSession(INTRO_SEEN_KEY, "true");
     writeSession(ACCESS_MODE_KEY, destination === "/suno" ? "rosie" : "standard");
@@ -250,7 +226,7 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
     setNotice(null);
     clearSession(AUTH_INTENT_KEY);
     writeSession(ACCESS_MODE_KEY, "guest");
-    closeGateway("/artist-draft-pool");
+    closeGateway("/");
   }
 
   if (!visible) return <>{children}</>;
@@ -336,7 +312,7 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
                 onClick={skipIntro}
                 className="shrink-0 border-gold/45 bg-black/30 text-gold-soft backdrop-blur hover:bg-gold/10 hover:text-white"
               >
-                Skip intro <SkipForward className="ml-2 size-4" />
+                Skip sequence <SkipForward className="ml-2 size-4" />
               </Button>
             </div>
           </div>
