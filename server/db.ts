@@ -340,6 +340,8 @@ export async function updateUserProfile(
     avatarUrl: string | null;
     websiteUrl: string | null;
     socialLinksJson: string | null;
+    sunoHandle: string | null;
+    agreementAcceptedAt: Date | null;
     emailUpdatesEnabled: number;
     pushEnabled: number;
   }>,

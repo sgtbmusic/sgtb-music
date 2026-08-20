@@ -22,6 +22,8 @@ export const users = mysqlTable("users", {
   bio: text("bio"),
   websiteUrl: varchar("websiteUrl", { length: 512 }),
   socialLinksJson: text("socialLinksJson"),
+  sunoHandle: varchar("sunoHandle", { length: 128 }),
+  agreementAcceptedAt: timestamp("agreementAcceptedAt"),
   emailUpdatesEnabled: int("emailUpdatesEnabled").default(1).notNull(),
   pushEnabled: int("pushEnabled").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

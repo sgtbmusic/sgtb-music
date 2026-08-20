@@ -200,3 +200,10 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Verify expanded profile fields persist through auth.me after refresh on an authenticated session (authenticated Owner Admin session confirmed)
 - [x] Re-run the signed-in Settings/Profile save-and-refresh smoke test before marking the platform stabilized
 - [x] Invalidate `profile.me` alongside `auth.me` after profile updates so public Profile reflects saved fields immediately
+
+## Playlist Consideration & Participation Agreement (Aug 2026)
+- [x] Add `sunoHandle` and `agreementAcceptedAt` to users schema and profile router
+- [x] Build a first-time onboarding modal/flow requiring Suno handle entry and a professional scroll-to-read participation agreement modal
+- [x] Update track uploads so owner uploads auto-approve while user uploads remain pending until admin review
+- [x] Highlight playlist consideration prominently on the home page and upload flow
+- [x] Verify TypeScript build, tests, responsive checks, and save checkpoint

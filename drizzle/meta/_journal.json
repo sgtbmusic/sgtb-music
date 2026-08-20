@@ -78,6 +78,13 @@
       "when": 1787230481511,
       "tag": "0010_rare_red_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1787235612785,
+      "tag": "0011_long_shiva",
+      "breakpoints": true
     }
   ]
 }

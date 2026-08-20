@@ -81,6 +81,23 @@ export default function SocialFeed() {
               <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.28em] text-neon"><Sparkles className="size-3" /> SGTB Network / Main Feed</div>
               <h1 className="mt-4 max-w-3xl font-display text-5xl uppercase leading-[0.86] text-white sm:text-7xl">The signal is <span className="text-gold-gradient">live.</span></h1>
               <p className="mt-5 max-w-2xl text-sm leading-7 text-white/65">A high-signal social layer for Reference Demos, Analog Re-Tracking updates, visual drops, and the people shaping the next release.</p>
+              
+              <div className="mt-6 rounded-2xl border border-gold/40 bg-black/40 p-4 text-left flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-sm">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2.5 rounded-xl bg-gold/20 text-gold shrink-0">
+                    <AudioLines className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-xs uppercase tracking-wider">Chance to Get On The Official SGTB Playlist</h3>
+                    <p className="text-xs text-gray-300">Owner uploads auto-approve instantly; user submissions are reviewed by A&R for playlist consideration.</p>
+                  </div>
+                </div>
+                <Link href="/music">
+                  <Button className="bg-gold text-black hover:bg-gold-soft font-mono text-xs uppercase tracking-wider h-9 px-4 shrink-0 font-bold">
+                    View Catalog
+                  </Button>
+                </Link>
+              </div>
             </section>
 
             <section className="mb-7 rounded-3xl border border-white/10 bg-card/70 p-5 shadow-xl sm:p-6">

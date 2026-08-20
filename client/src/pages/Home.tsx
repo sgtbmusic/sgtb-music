@@ -31,7 +31,27 @@ export default function Home() {
               We operate as the premier A&R incubation engine, taking high-level Reference Demos generated via Suno and elevating them through professional Analog Re-Tracking. Replacing digital placeholder tracks with clean, studio-recorded vocals and live session musicians to deliver radio-ready masters for major label distribution.
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            {/* Playlist Consideration Banner */}
+            <div className="mt-8 mx-auto max-w-2xl rounded-2xl border border-gold/40 bg-gradient-to-r from-gold/15 via-[#12141a] to-gold/10 p-5 text-left shadow-xl shadow-gold/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-3 rounded-xl bg-gold/20 text-gold shrink-0">
+                  <Music4 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold text-sm uppercase tracking-wider">Get On The Official SGTB Playlist</h3>
+                  <p className="text-xs text-gray-300 mt-0.5">
+                    Submit your Suno reference demos for A&R evaluation. Owner uploads are auto-approved; creator submissions are reviewed promptly!
+                  </p>
+                </div>
+              </div>
+              <Link href="/upload">
+                <Button className="bg-gold text-black hover:bg-gold-soft font-mono text-xs uppercase tracking-wider h-10 px-6 shrink-0 font-bold">
+                  Submit Song Now <ArrowUpRight className="ml-1.5 size-4" />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Link href="/music">
                 <Button className="bg-gold text-[#17120a] hover:bg-gold-soft font-mono text-xs uppercase tracking-wider h-12 px-8">
                   Explore Catalog Player <ArrowUpRight className="ml-2 size-4" />

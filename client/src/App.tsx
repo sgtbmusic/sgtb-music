@@ -19,6 +19,7 @@ import AdminPortal from "@/pages/AdminPortal";
 import AdminInbox from "@/pages/AdminInbox";
 import Rewards from "@/pages/Rewards";
 import { PersistentAudioPlayer } from "@/components/PersistentAudioPlayer";
+import { FirstTimeOnboardingModal } from "@/components/FirstTimeOnboardingModal";
 import SocialFeed from "./pages/SocialFeed";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
@@ -63,6 +64,7 @@ function App() {
           <AccessGateway>
             <Router />
             <PersistentAudioPlayer />
+            <FirstTimeOnboardingModal />
           </AccessGateway>
         </TooltipProvider>
       </ThemeProvider>

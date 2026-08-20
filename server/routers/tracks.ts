@@ -66,14 +66,15 @@ export const tracksRouter = router({
       finalInput.dspPlacement = finalInput.dspPlacement || packaging.dspPlacement;
       finalInput.virtualArtistsJson = finalInput.virtualArtistsJson || JSON.stringify(packaging.virtualArtists);
     }
-    const isPrivileged = ctx.user.role === "admin" || ctx.user.role === "rep";
+    const isAdmin = ctx.user.role === "admin";
+    const status = isAdmin ? "approved" : "pending";
     const id = await createTrack({
       ...finalInput,
       sortOrder: nextOrder,
-      status: isPrivileged ? "approved" : "pending",
+      status,
       uploaderId: ctx.user.id,
     });
-    return { id, status: isPrivileged ? "approved" : "pending" };
+    return { id, status };
   }),
 
   moderate: repOrAdminProcedure
