@@ -1,15 +1,27 @@
+import { useMemo, useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { SiteLayout } from "@/components/SiteLayout";
 import { PipelineBlueprint } from "@/components/PipelineBlueprint";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpRight, ShieldCheck, Sparkles, TrendingUp, Music4, Cpu, Layers } from "lucide-react";
+import { ArrowDownUp, ArrowUpRight, CalendarDays, Play, ShieldCheck, Sparkles, TrendingUp, Music4 } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { requestTrackPlayback } from "@/components/PersistentAudioPlayer";
+
+type LeaderboardSortMode = "signal" | "newest" | "oldest";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const { data: pendingTracks = [], isLoading: pendingTracksLoading } = trpc.tracks.pendingLeaderboard.useQuery();
+  const [sortMode, setSortMode] = useState<LeaderboardSortMode>("signal");
+  const sortedPendingTracks = useMemo(() => {
+    return [...pendingTracks].sort((a, b) => {
+      if (sortMode === "newest") return new Date(b.track.createdAt).getTime() - new Date(a.track.createdAt).getTime();
+      if (sortMode === "oldest") return new Date(a.track.createdAt).getTime() - new Date(b.track.createdAt).getTime();
+      return b.track.hitPotential - a.track.hitPotential || b.track.upvotesCount - a.track.upvotesCount || b.track.playsCount - a.track.playsCount;
+    });
+  }, [pendingTracks, sortMode]);
 
   return (
     <SiteLayout>
@@ -77,16 +89,71 @@ export default function Home() {
       {/* Public Playlist Consideration Leaderboard */}
       <section className="border-b border-white/8 bg-black/20 py-16 sm:py-20">
         <div className="container">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-neon">A&amp;R Intake / Live Queue</p>
               <h2 className="mt-3 font-display text-4xl uppercase text-white sm:text-5xl">Playlist consideration.</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">Creator submissions currently awaiting SGTB A&amp;R review. Rankings surface the strongest early signals without exposing unreleased audio before clearance.</p>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">Creator submissions currently awaiting SGTB A&amp;R review. Preview each Reference Demo directly, then sort the queue by commercial signal or submission date.</p>
             </div>
-            <Link href="/upload"><Button variant="outline" className="w-fit border-gold/30 bg-gold/5 text-gold hover:bg-gold/15 font-mono text-xs uppercase tracking-wider"><Music4 className="mr-2 size-4" /> Submit a track</Button></Link>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-1" role="group" aria-label="Sort playlist consideration queue">
+                <span className="px-2 font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">Sort</span>
+                {([
+                  ["signal", "Signal"],
+                  ["newest", "Newest"],
+                  ["oldest", "Oldest"],
+                ] as const).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setSortMode(value)}
+                    aria-pressed={sortMode === value}
+                    className={`rounded-lg px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] transition ${sortMode === value ? "bg-gold text-[#17120a]" : "text-muted-foreground hover:bg-white/10 hover:text-white"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <Link href="/upload"><Button variant="outline" className="w-fit border-gold/30 bg-gold/5 text-gold hover:bg-gold/15 font-mono text-xs uppercase tracking-wider"><Music4 className="mr-2 size-4" /> Submit a track</Button></Link>
+            </div>
           </div>
 
-          {pendingTracksLoading ? <div className="mt-8 rounded-2xl border border-white/10 bg-card/40 p-6 text-sm text-muted-foreground">Loading the A&amp;R queue…</div> : pendingTracks.length === 0 ? <div className="mt-8 rounded-2xl border border-dashed border-white/15 bg-card/30 p-8 text-center"><TrendingUp className="mx-auto size-8 text-gold/60" /><p className="mt-3 font-display text-2xl uppercase text-white">The next signal could be yours.</p><p className="mt-2 text-sm text-muted-foreground">No creator submissions are currently waiting for playlist consideration.</p></div> : <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">{pendingTracks.map(({ track, uploader }, index) => <div key={track.id} className="group rounded-2xl border border-white/10 bg-card/60 p-5 transition hover:-translate-y-0.5 hover:border-gold/30"><div className="flex items-center justify-between gap-3"><span className="font-mono text-[10px] uppercase tracking-wider text-gold">Queue #{index + 1}</span><span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-amber-300">Pending</span></div><h3 className="mt-5 truncate font-display text-2xl uppercase text-white">{track.title}</h3><p className="mt-1 truncate text-xs text-muted-foreground">{track.artist} · {track.genre || "Genre pending"}</p><div className="mt-5 grid grid-cols-2 gap-2 text-xs"><div className="rounded-xl border border-white/10 bg-black/20 p-3"><p className="font-display text-xl text-gold">{track.hitPotential}%</p><p className="mt-1 text-muted-foreground">Signal index</p></div><div className="rounded-xl border border-white/10 bg-black/20 p-3"><p className="font-display text-xl text-neon">{track.upvotesCount}</p><p className="mt-1 text-muted-foreground">Support</p></div></div><p className="mt-4 truncate text-[11px] text-white/50">{uploader?.sunoHandle || uploader?.username || uploader?.name || "SGTB creator"}</p></div>)}</div>}
+          {pendingTracksLoading ? (
+            <div className="mt-8 rounded-2xl border border-white/10 bg-card/40 p-6 text-sm text-muted-foreground">Loading the A&amp;R queue…</div>
+          ) : pendingTracks.length === 0 ? (
+            <div className="mt-8 rounded-2xl border border-dashed border-white/15 bg-card/30 p-8 text-center"><TrendingUp className="mx-auto size-8 text-gold/60" /><p className="mt-3 font-display text-2xl uppercase text-white">The next signal could be yours.</p><p className="mt-2 text-sm text-muted-foreground">No creator submissions are currently waiting for playlist consideration.</p></div>
+          ) : (
+            <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {sortedPendingTracks.map(({ track, uploader }, index) => (
+                <article key={track.id} className="group rounded-2xl border border-white/10 bg-card/60 p-5 transition hover:-translate-y-0.5 hover:border-gold/30">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-gold">Queue #{index + 1}</span>
+                    <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-amber-300">Pending</span>
+                  </div>
+                  <h3 className="mt-5 truncate font-display text-2xl uppercase text-white">{track.title}</h3>
+                  <p className="mt-1 truncate text-xs text-muted-foreground">{track.artist} · {track.genre || "Genre pending"}</p>
+                  <div className="mt-5 grid grid-cols-2 gap-2 text-xs">
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3"><p className="font-display text-xl text-gold">{track.hitPotential}%</p><p className="mt-1 text-muted-foreground">Signal index</p></div>
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3"><p className="font-display text-xl text-neon">{track.upvotesCount}</p><p className="mt-1 text-muted-foreground">Support</p></div>
+                  </div>
+                  <p className="mt-4 truncate text-[11px] text-white/50">{uploader?.sunoHandle || uploader?.username || uploader?.name || "SGTB creator"}</p>
+                  <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
+                    <p className="flex min-w-0 items-center gap-1.5 truncate font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground" title={new Date(track.createdAt).toLocaleString()}><CalendarDays className="size-3 shrink-0 text-gold/70" /> {new Date(track.createdAt).toLocaleDateString()}</p>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => requestTrackPlayback({ id: track.id, title: track.title, artist: track.artist, audioUrl: track.audioUrl, coverUrl: track.coverUrl, coverVariant: track.coverVariant, durationSeconds: track.durationSeconds })}
+                      className="shrink-0 bg-gold text-[#17120a] hover:bg-gold-soft"
+                      aria-label={`Play ${track.title}`}
+                    >
+                      <Play className="mr-1.5 size-3.5 fill-current" /> Preview
+                    </Button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+          <p className="mt-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground"><ArrowDownUp className="size-3 text-gold/70" /> Queue rankings update as the A&amp;R signal changes; newest and oldest views use the original submission timestamp.</p>
         </div>
       </section>
 

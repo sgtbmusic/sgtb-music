@@ -222,3 +222,11 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Add pending creator-track leaderboard, profile Pending/Approved indicators, and admin queue status filtering
 - [x] Add email verification status, resend control, Suno handle editing, and secure profile persistence support
 - [x] Validate TypeScript, production build, 31 Vitest tests, and responsive authenticated UI flows
+
+## Password Recovery, Leaderboard Playback, & Bulk Moderation (Aug 2026)
+- [ ] Add password-reset token schema and secure request/reset tRPC procedures
+- [ ] Build professional Forgot Password and Reset Password recovery pages
+- [ ] Add direct audio playback controls and submission-date sorting to the home page playlist leaderboard
+- [ ] Add bulk selection and bulk approve/deny actions to the admin moderation dashboard
+- [ ] Run type checks, Vitest tests, and save checkpoint
+- [x] Add a visible Forgot Password link to the AccessGateway sign-in terminal

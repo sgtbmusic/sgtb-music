@@ -25,7 +25,9 @@ import SocialFeed from "./pages/SocialFeed";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import Explore from "./pages/Explore";
-import VerifyEmail from "./pages/VerifyEmail";
+import VerifyEmail from "@/pages/VerifyEmail";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 
@@ -59,6 +61,8 @@ function Router() {
       <Route path="/rewards" component={Rewards} />
       <Route path="/settings" component={Settings} />
       <Route path="/verify-email" component={VerifyEmail} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/404" component={NotFound} />
       {/* Legacy/alias paths keep deep links working */}
       <Route path="/suno-business">{() => <Redirect to="/suno" />}</Route>

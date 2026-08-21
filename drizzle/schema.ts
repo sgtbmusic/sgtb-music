@@ -28,6 +28,8 @@ export const users = mysqlTable("users", {
   emailVerified: int("emailVerified").default(0).notNull(),
   verificationToken: varchar("verificationToken", { length: 128 }),
   verificationExpiresAt: timestamp("verificationExpiresAt"),
+  resetToken: varchar("resetToken", { length: 128 }),
+  resetExpiresAt: timestamp("resetExpiresAt"),
   emailUpdatesEnabled: int("emailUpdatesEnabled").default(1).notNull(),
   pushEnabled: int("pushEnabled").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

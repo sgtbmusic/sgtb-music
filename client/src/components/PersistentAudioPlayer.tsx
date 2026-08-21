@@ -5,8 +5,24 @@ import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Disc3, Music2 } f
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 
+type PlayerTrack = {
+  id: number;
+  title: string;
+  artist?: string | null;
+  audioUrl: string;
+  coverUrl?: string | null;
+  coverVariant?: number | null;
+  durationSeconds?: number | null;
+};
+
+export function requestTrackPlayback(track: PlayerTrack) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent<PlayerTrack>("sgtb:play-track", { detail: track }));
+}
+
 export function PersistentAudioPlayer() {
   const { data: tracks = [] } = trpc.tracks.list.useQuery();
+  const [externalTrack, setExternalTrack] = useState<PlayerTrack | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -15,7 +31,20 @@ export function PersistentAudioPlayer() {
   const [muted, setMuted] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const current = tracks[currentIndex] ?? null;
+  const playlist = externalTrack ? [externalTrack, ...tracks.filter((track) => track.id !== externalTrack.id)] : tracks;
+  const current = playlist[currentIndex] ?? null;
+
+  useEffect(() => {
+    const handleTrackRequest = (event: Event) => {
+      const requestedTrack = (event as CustomEvent<PlayerTrack>).detail;
+      if (!requestedTrack?.audioUrl) return;
+      setExternalTrack(requestedTrack);
+      setCurrentIndex(0);
+      setPlaying(true);
+    };
+    window.addEventListener("sgtb:play-track", handleTrackRequest);
+    return () => window.removeEventListener("sgtb:play-track", handleTrackRequest);
+  }, []);
 
   useEffect(() => {
     const el = audioRef.current;
@@ -49,15 +78,15 @@ export function PersistentAudioPlayer() {
   };
 
   const handleNext = () => {
-    if (tracks.length === 0) return;
-    const next = (currentIndex + 1) % tracks.length;
+    if (playlist.length === 0) return;
+    const next = (currentIndex + 1) % playlist.length;
     setCurrentIndex(next);
     setPlaying(true);
   };
 
   const handlePrev = () => {
-    if (tracks.length === 0) return;
-    const prev = (currentIndex - 1 + tracks.length) % tracks.length;
+    if (playlist.length === 0) return;
+    const prev = (currentIndex - 1 + playlist.length) % playlist.length;
     setCurrentIndex(prev);
     setPlaying(true);
   };

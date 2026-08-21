@@ -5,7 +5,7 @@ import { randomBytes } from "node:crypto";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { sdk } from "./_core/sdk";
 import * as db from "./db";
-import { createVerificationToken, sendVerificationEmail } from "./email";
+import { createVerificationToken, sendVerificationEmail, sendPasswordResetEmail } from "./email";
 import { hashPassword, verifyPassword } from "./auth/password";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
@@ -63,6 +63,33 @@ export const appRouter = router({
           try { await sendVerificationEmail({ to: user.email, token, origin: `${ctx.req.protocol}://${ctx.req.get("host")}` }); } catch (error) { console.error("[Auth] Resend verification failed", error); }
         }
         return { success: true, message: "If an unverified account exists for that email, a confirmation link has been sent." } as const;
+      }),
+    requestPasswordReset: publicProcedure
+      .input(z.object({ email: z.string().email().max(320) }))
+      .mutation(async ({ ctx, input }) => {
+        const user = await db.getUserByEmail(input.email.trim().toLowerCase());
+        if (user && user.email) {
+          const token = createVerificationToken();
+          const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+          await db.updateUserProfile(user.id, { resetToken: token, resetExpiresAt: expiresAt });
+          try {
+            await sendPasswordResetEmail({ to: user.email, token, origin: `${ctx.req.protocol}://${ctx.req.get("host")}` });
+          } catch (error) {
+            console.error("[Auth] Password reset email dispatch failed", error);
+          }
+        }
+        return { success: true, message: "If an account exists for that email, a password reset link has been sent." } as const;
+      }),
+    resetPassword: publicProcedure
+      .input(z.object({ token: z.string().min(1).max(128), newPassword: z.string().min(8).max(128) }))
+      .mutation(async ({ ctx, input }) => {
+        const user = await db.getUserByResetToken(input.token);
+        if (!user || !user.resetExpiresAt || user.resetExpiresAt.getTime() < Date.now()) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "This password reset link is invalid or expired." });
+        }
+        const passwordHash = await hashPassword(input.newPassword);
+        await db.updateUserProfile(user.id, { passwordHash, resetToken: null, resetExpiresAt: null, emailVerified: 1 });
+        return { success: true, message: "Password updated successfully. You can now sign in." } as const;
       }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);

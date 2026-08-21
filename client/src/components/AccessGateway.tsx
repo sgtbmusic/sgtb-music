@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -421,6 +422,14 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
                       autoComplete={authMode === "register" ? "new-password" : "current-password"}
                       className="h-12 border-white/12 bg-black/20 text-white placeholder:text-muted-foreground/60"
                     />
+                  </div>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span />
+                    {authMode === "signin" && (
+                      <Link href="/forgot-password" className="font-mono uppercase tracking-[0.14em] text-gold-soft underline decoration-gold/30 hover:text-gold">
+                        Forgot password?
+                      </Link>
+                    )}
                   </div>
                   <Button type="submit" disabled={loginMutation.isPending || registerMutation.isPending} className="h-12 w-full bg-gold font-display text-xl uppercase tracking-[0.08em] text-[#17120a] hover:bg-gold-soft">
                     {(loginMutation.isPending || registerMutation.isPending) ? <Loader2 className="mr-2 size-4 animate-spin" /> : <ArrowRight className="mr-2 size-4" />}

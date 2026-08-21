@@ -159,6 +159,10 @@ export async function listPendingTracks(limit = 8) {
         id: tracks.id,
         title: tracks.title,
         artist: tracks.artist,
+        audioUrl: tracks.audioUrl,
+        coverUrl: tracks.coverUrl,
+        coverVariant: tracks.coverVariant,
+        durationSeconds: tracks.durationSeconds,
         genre: tracks.genre,
         subGenre: tracks.subGenre,
         bpm: tracks.bpm,
@@ -403,6 +407,9 @@ export async function updateUserProfile(
     emailVerified: number;
     verificationToken: string | null;
     verificationExpiresAt: Date | null;
+    resetToken: string | null;
+    resetExpiresAt: Date | null;
+    passwordHash: string | null;
     emailUpdatesEnabled: number;
     pushEnabled: number;
   }>,
@@ -416,7 +423,14 @@ export async function getUserByVerificationToken(token: string) {
   const db = await getDb();
   if (!db) return undefined;
   const result = await db.select().from(users).where(eq(users.verificationToken, token)).limit(1);
-  return result[0];
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByResetToken(token: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.resetToken, token)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
 }
 
 export async function verifyUserEmailByToken(token: string) {
