@@ -12,6 +12,7 @@ export default function AdminPortal() {
   const { user, loading: authLoading } = useAuth();
   const utils = trpc.useUtils();
   const [activeTab, setActiveTab] = useState<"tracks" | "stats" | "team">("tracks");
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
 
   const { data: tracks = [], isLoading: tracksLoading } = trpc.tracks.listAdmin.useQuery(undefined, {
     enabled: !!user && (user.role === "admin" || user.role === "rep"),
@@ -40,6 +41,7 @@ export default function AdminPortal() {
 
   const isPrivileged = user && (user.role === "admin" || user.role === "rep");
   const isAdmin = user && user.role === "admin";
+  const filteredTracks = statusFilter === "all" ? tracks : tracks.filter((track) => track.status === statusFilter);
 
   if (!isPrivileged) {
     return (
@@ -107,14 +109,14 @@ export default function AdminPortal() {
 
         {activeTab === "tracks" && (
           <div className="mt-8 space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-2xl uppercase text-white">Submission Moderation Queue</h2>
-              <span className="font-mono text-xs uppercase tracking-widest text-gold">Role: {user.role.toUpperCase()}</span>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div><h2 className="font-display text-2xl uppercase text-white">Submission Moderation Queue</h2><p className="mt-1 text-xs text-muted-foreground">{filteredTracks.length} of {tracks.length} catalog records shown</p></div>
+              <div className="flex flex-wrap items-center gap-3"><label htmlFor="track-status-filter" className="font-mono text-[10px] uppercase tracking-wider text-gold">Filter status</label><select id="track-status-filter" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)} className="rounded-lg border border-gold/30 bg-[#101014] px-3 py-2 text-xs uppercase tracking-wider text-white outline-none focus:border-gold"><option value="all">All statuses</option><option value="pending">Pending only</option><option value="approved">Approved only</option><option value="rejected">Rejected only</option></select><span className="font-mono text-[10px] uppercase tracking-widest text-gold">Role: {user.role.toUpperCase()}</span></div>
             </div>
 
             {tracksLoading ? (
               <p className="py-12 text-center font-mono text-xs uppercase text-muted-foreground">Loading queue...</p>
-            ) : tracks.length === 0 ? (
+            ) : filteredTracks.length === 0 ? (
               <div className="rounded-3xl border border-white/10 bg-card/40 p-12 text-center">
                 <ShieldCheck className="mx-auto size-12 text-gold/50" />
                 <h3 className="mt-4 font-display text-xl uppercase text-white">Queue is clear</h3>
@@ -122,7 +124,7 @@ export default function AdminPortal() {
               </div>
             ) : (
               <div className="grid gap-4">
-                {tracks.map((track) => {
+                {filteredTracks.map((track) => {
                   const isPending = track.status === "pending";
                   const isApproved = track.status === "approved";
                   return (

@@ -2,6 +2,7 @@ import { COOKIE_NAME, ONE_YEAR_MS, OAUTH_STATE_COOKIE, decodeOAuthState } from "
 import { parse as parseCookieHeader } from "cookie";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
+import { createVerificationToken, sendVerificationEmail } from "../email";
 import { getSessionCookieOptions } from "./cookies";
 import { sdk } from "./sdk";
 
@@ -47,6 +48,30 @@ export function registerOAuthRoutes(app: Express) {
         loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
         lastSignedIn: new Date(),
       });
+
+      const persistedUser = await db.getUserByOpenId(userInfo.openId);
+      let needsVerification = Boolean(persistedUser?.email && persistedUser.emailVerified === 0);
+      let verificationDispatchFailed = false;
+      if (needsVerification && persistedUser?.email) {
+        const tokenExpired = !persistedUser.verificationExpiresAt || persistedUser.verificationExpiresAt.getTime() <= Date.now();
+        if (!persistedUser.verificationToken || tokenExpired) {
+          const token = createVerificationToken();
+          const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+          await db.updateUserProfile(persistedUser.id, { verificationToken: token, verificationExpiresAt: expiresAt });
+          try {
+            const origin = `${req.protocol}://${req.get("host")}`;
+            await sendVerificationEmail({ to: persistedUser.email, token, origin });
+          } catch (emailError) {
+            verificationDispatchFailed = true;
+            console.error("[OAuth] Verification email dispatch failed", emailError);
+          }
+        }
+      }
+
+      if (needsVerification) {
+        res.redirect(302, `/verify-email?sent=${verificationDispatchFailed ? "0" : "1"}`);
+        return;
+      }
 
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {
         name: userInfo.name || "",

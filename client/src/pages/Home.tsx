@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, ShieldCheck, Sparkles, TrendingUp, Music4, Cpu, Layers } from "lucide-react";
 import { Link } from "wouter";
+import { trpc } from "@/lib/trpc";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
+  const { data: pendingTracks = [], isLoading: pendingTracksLoading } = trpc.tracks.pendingLeaderboard.useQuery();
 
   return (
     <SiteLayout>
@@ -69,6 +71,22 @@ export default function Home() {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Public Playlist Consideration Leaderboard */}
+      <section className="border-b border-white/8 bg-black/20 py-16 sm:py-20">
+        <div className="container">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-neon">A&amp;R Intake / Live Queue</p>
+              <h2 className="mt-3 font-display text-4xl uppercase text-white sm:text-5xl">Playlist consideration.</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">Creator submissions currently awaiting SGTB A&amp;R review. Rankings surface the strongest early signals without exposing unreleased audio before clearance.</p>
+            </div>
+            <Link href="/upload"><Button variant="outline" className="w-fit border-gold/30 bg-gold/5 text-gold hover:bg-gold/15 font-mono text-xs uppercase tracking-wider"><Music4 className="mr-2 size-4" /> Submit a track</Button></Link>
+          </div>
+
+          {pendingTracksLoading ? <div className="mt-8 rounded-2xl border border-white/10 bg-card/40 p-6 text-sm text-muted-foreground">Loading the A&amp;R queue…</div> : pendingTracks.length === 0 ? <div className="mt-8 rounded-2xl border border-dashed border-white/15 bg-card/30 p-8 text-center"><TrendingUp className="mx-auto size-8 text-gold/60" /><p className="mt-3 font-display text-2xl uppercase text-white">The next signal could be yours.</p><p className="mt-2 text-sm text-muted-foreground">No creator submissions are currently waiting for playlist consideration.</p></div> : <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">{pendingTracks.map(({ track, uploader }, index) => <div key={track.id} className="group rounded-2xl border border-white/10 bg-card/60 p-5 transition hover:-translate-y-0.5 hover:border-gold/30"><div className="flex items-center justify-between gap-3"><span className="font-mono text-[10px] uppercase tracking-wider text-gold">Queue #{index + 1}</span><span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-amber-300">Pending</span></div><h3 className="mt-5 truncate font-display text-2xl uppercase text-white">{track.title}</h3><p className="mt-1 truncate text-xs text-muted-foreground">{track.artist} · {track.genre || "Genre pending"}</p><div className="mt-5 grid grid-cols-2 gap-2 text-xs"><div className="rounded-xl border border-white/10 bg-black/20 p-3"><p className="font-display text-xl text-gold">{track.hitPotential}%</p><p className="mt-1 text-muted-foreground">Signal index</p></div><div className="rounded-xl border border-white/10 bg-black/20 p-3"><p className="font-display text-xl text-neon">{track.upvotesCount}</p><p className="mt-1 text-muted-foreground">Support</p></div></div><p className="mt-4 truncate text-[11px] text-white/50">{uploader?.sunoHandle || uploader?.username || uploader?.name || "SGTB creator"}</p></div>)}</div>}
         </div>
       </section>
 

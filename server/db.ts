@@ -113,6 +113,19 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createLocalUser(data: { openId: string; email: string; name: string; passwordHash: string; verificationToken: string; verificationExpiresAt: Date }) {
+  const db = await requireDb();
+  await db.insert(users).values({ ...data, loginMethod: "email", emailVerified: 0, lastSignedIn: new Date() });
+  return getUserByOpenId(data.openId);
+}
+
 async function requireDb() {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -135,6 +148,51 @@ export async function listAllTracksAdmin() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(tracks).orderBy(asc(tracks.sortOrder), asc(tracks.id));
+}
+
+export async function listPendingTracks(limit = 8) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({
+      track: {
+        id: tracks.id,
+        title: tracks.title,
+        artist: tracks.artist,
+        genre: tracks.genre,
+        subGenre: tracks.subGenre,
+        bpm: tracks.bpm,
+        trackKey: tracks.trackKey,
+        vibe: tracks.vibe,
+        playsCount: tracks.playsCount,
+        upvotesCount: tracks.upvotesCount,
+        hitPotential: tracks.hitPotential,
+        syncReady: tracks.syncReady,
+        status: tracks.status,
+        createdAt: tracks.createdAt,
+      },
+      uploader: {
+        id: users.id,
+        name: users.name,
+        username: users.username,
+        sunoHandle: users.sunoHandle,
+      },
+    })
+    .from(tracks)
+    .leftJoin(users, eq(tracks.uploaderId, users.id))
+    .where(eq(tracks.status, "pending"))
+    .orderBy(desc(tracks.upvotesCount), desc(tracks.playsCount), asc(tracks.createdAt))
+    .limit(limit);
+}
+
+export async function listUserTracks(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(tracks)
+    .where(eq(tracks.uploaderId, userId))
+    .orderBy(desc(tracks.createdAt));
 }
 
 export async function createTrack(values: InsertTrack) {
@@ -342,6 +400,9 @@ export async function updateUserProfile(
     socialLinksJson: string | null;
     sunoHandle: string | null;
     agreementAcceptedAt: Date | null;
+    emailVerified: number;
+    verificationToken: string | null;
+    verificationExpiresAt: Date | null;
     emailUpdatesEnabled: number;
     pushEnabled: number;
   }>,
@@ -349,6 +410,22 @@ export async function updateUserProfile(
   const db = await getDb();
   if (!db || Object.keys(updates).length === 0) return;
   await db.update(users).set(updates).where(eq(users.id, userId));
+}
+
+export async function getUserByVerificationToken(token: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.verificationToken, token)).limit(1);
+  return result[0];
+}
+
+export async function verifyUserEmailByToken(token: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const user = await getUserByVerificationToken(token);
+  if (!user || !user.verificationExpiresAt || user.verificationExpiresAt.getTime() < Date.now()) return undefined;
+  await db.update(users).set({ emailVerified: 1, verificationToken: null, verificationExpiresAt: null }).where(eq(users.id, user.id));
+  return user;
 }
 
 export async function updateUserAvatarAndPush(userId: number, avatarUrl?: string, pushEnabled?: number) {

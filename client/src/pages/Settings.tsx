@@ -34,6 +34,7 @@ export default function Settings() {
   const [avatarInput, setAvatarInput] = useState(user?.avatarUrl || "");
   const [nameInput, setNameInput] = useState(user?.name || "");
   const [usernameInput, setUsernameInput] = useState(user?.username || "");
+  const [sunoHandleInput, setSunoHandleInput] = useState(user?.sunoHandle || "");
   const [bioInput, setBioInput] = useState(user?.bio || "");
   const [websiteInput, setWebsiteInput] = useState(user?.websiteUrl || "");
   const [linksInput, setLinksInput] = useState(() => {
@@ -52,6 +53,7 @@ export default function Settings() {
     setAvatarInput(user.avatarUrl || "");
     setNameInput(user.name || "");
     setUsernameInput(user.username || "");
+    setSunoHandleInput(user.sunoHandle || "");
     setBioInput(user.bio || "");
     setWebsiteInput(user.websiteUrl || "");
     setEmailUpdatesEnabled(user.emailUpdatesEnabled !== 0);
@@ -73,6 +75,7 @@ export default function Settings() {
           avatarUrl: data.url,
           name: nameInput,
           username: usernameInput,
+          sunoHandle: sunoHandleInput,
           bio: bioInput,
           websiteUrl: websiteInput,
           socialLinksJson: serializeSocialLinks(linksInput),
@@ -85,6 +88,11 @@ export default function Settings() {
     onError: (err) => {
       toast.error(err.message || "Failed to upload avatar image.");
     },
+  });
+
+  const resendVerificationMutation = trpc.profile.sendVerificationEmail.useMutation({
+    onSuccess: (result) => toast.success(result.message),
+    onError: (err) => toast.error(err.message || "Unable to send verification email."),
   });
 
   const updateProfileMutation = trpc.profile.update.useMutation({
@@ -127,6 +135,7 @@ export default function Settings() {
       avatarUrl: avatarInput || null,
       name: nameInput || null,
       username: usernameInput || null,
+      sunoHandle: sunoHandleInput || null,
       bio: bioInput || null,
       websiteUrl: websiteInput || null,
       socialLinksJson: serializeSocialLinks(linksInput),
@@ -181,6 +190,10 @@ export default function Settings() {
                   <p className="font-display text-2xl uppercase text-white">{user.name || user.email || "Authenticated User"}</p>
                   <p className="mt-1 font-mono text-xs uppercase tracking-wider text-gold">Role: {role.toUpperCase()} {isAdmin ? "(Owner Admin)" : isRep ? "(Suno Representative)" : "(Artist / Member)"}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">Signed in via secure Manus OAuth</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider ${user.emailVerified === 1 ? "border-neon/30 bg-neon/10 text-neon" : "border-amber-400/30 bg-amber-400/10 text-amber-300"}`}><ShieldCheck className="size-3" /> {user.emailVerified === 1 ? "Email confirmed" : "Email confirmation required"}</span>
+                    {user.emailVerified !== 1 && <Button type="button" variant="outline" onClick={() => resendVerificationMutation.mutate()} disabled={resendVerificationMutation.isPending} className="h-7 border-gold/25 px-2.5 font-mono text-[10px] uppercase tracking-wider text-gold hover:bg-gold/10">{resendVerificationMutation.isPending ? "Sending…" : "Resend confirmation"}</Button>}
+                  </div>
                 </div>
               </div>
               <Button
@@ -222,6 +235,11 @@ export default function Settings() {
                   <Label htmlFor="profile-username" className="font-mono text-xs uppercase text-gold">Username</Label>
                   <Input id="profile-username" value={usernameInput} onChange={(e) => setUsernameInput(e.target.value.replace(/\\s/g, "").toLowerCase())} placeholder="sgtb_creator" className="mt-2 bg-black/40 border-white/10 text-white" />
                 </div>
+              </div>
+              <div>
+                <Label htmlFor="profile-suno-handle" className="font-mono text-xs uppercase text-gold">Suno Creator Handle</Label>
+                <Input id="profile-suno-handle" value={sunoHandleInput} onChange={(e) => setSunoHandleInput(e.target.value)} placeholder="@sgtbmusic" className="mt-2 bg-black/40 border-white/10 text-white" />
+                <p className="mt-1 text-[11px] text-muted-foreground">Used to identify your creator profile for playlist consideration.</p>
               </div>
               <div>
                 <Label htmlFor="profile-bio" className="font-mono text-xs uppercase text-gold">Bio</Label>

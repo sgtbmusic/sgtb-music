@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import type { ReactNode } from "react";
 import NotFound from "@/pages/NotFound";
 import { Redirect, Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -24,6 +25,16 @@ import SocialFeed from "./pages/SocialFeed";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import Explore from "./pages/Explore";
+import VerifyEmail from "./pages/VerifyEmail";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { useLocation } from "wouter";
+
+function VerificationGate({ children }: { children: ReactNode }) {
+  const { user, loading } = useAuth();
+  const [location] = useLocation();
+  if (loading || !user || user.emailVerified !== 0 || location === "/verify-email") return <>{children}</>;
+  return <VerifyEmail />;
+}
 
 function Router() {
   return (
@@ -47,6 +58,7 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/rewards" component={Rewards} />
       <Route path="/settings" component={Settings} />
+      <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/404" component={NotFound} />
       {/* Legacy/alias paths keep deep links working */}
       <Route path="/suno-business">{() => <Redirect to="/suno" />}</Route>
@@ -62,7 +74,9 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <AccessGateway>
-            <Router />
+            <VerificationGate>
+              <Router />
+            </VerificationGate>
             <PersistentAudioPlayer />
             <FirstTimeOnboardingModal />
           </AccessGateway>

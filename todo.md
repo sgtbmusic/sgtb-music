@@ -207,3 +207,18 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Update track uploads so owner uploads auto-approve while user uploads remain pending until admin review
 - [x] Highlight playlist consideration prominently on the home page and upload flow
 - [x] Verify TypeScript build, tests, responsive checks, and save checkpoint
+
+## Authentication, Leaderboard, & Admin Dashboard Updates (Aug 2026)
+- [x] Audit OAuth and session routing architecture against required email-verification gating
+- [x] Implement email verification token schema and verification email dispatch workflow using the configured Resend integration; new local accounts remain blocked until confirmation
+- [x] Build public home-page leaderboard for pending creator tracks awaiting playlist placement
+- [x] Build visual approval badge and status indicator on user profiles (Pending vs Approved)
+- [x] Add dynamic pending-track filter and management controls in the admin dashboard
+- [x] Verify tests, responsive layout, and save checkpoint; executive password was not used or stored, with owner access remaining available through secure OAuth
+
+## Auth & Playlist Moderation Update (Aug 2026)
+- [x] Add secure local email/password registration with scrypt password hashing; do not store or use the executive password supplied in chat
+- [x] Add real email verification links, expiry, public resend, and strict session gating for unverified new accounts
+- [x] Add pending creator-track leaderboard, profile Pending/Approved indicators, and admin queue status filtering
+- [x] Add email verification status, resend control, Suno handle editing, and secure profile persistence support
+- [x] Validate TypeScript, production build, 31 Vitest tests, and responsive authenticated UI flows

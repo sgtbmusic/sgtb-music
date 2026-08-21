@@ -5,7 +5,9 @@ import {
   deleteTrack,
   getMaxTrackSortOrder,
   listAllTracksAdmin,
+  listPendingTracks,
   listTracks,
+  listUserTracks,
   updateTrack,
 } from "../db";
 import { adminProcedure, protectedProcedure, publicProcedure, repOrAdminProcedure, router } from "../_core/trpc";
@@ -33,6 +35,10 @@ const trackInput = z.object({
 
 export const tracksRouter = router({
   list: publicProcedure.query(() => listTracks()),
+
+  pendingLeaderboard: publicProcedure.query(() => listPendingTracks()),
+
+  mine: protectedProcedure.query(({ ctx }) => listUserTracks(ctx.user.id)),
 
   listAdmin: repOrAdminProcedure.query(() => listAllTracksAdmin()),
 

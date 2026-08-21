@@ -18,6 +18,7 @@ import { type FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } 
 import { useLocation } from "wouter";
 import { CAR_INTRO_CLIP, type IntroClip } from "@/lib/introMedia";
 import { getPlayIntroOnLogin, INTRO_REPLAY_EVENT } from "@/lib/gatewayPreferences";
+import { trpc } from "@/lib/trpc";
 
 const INTRO_SEEN_KEY = "sgtb-records-intro-seen";
 const AUTH_INTENT_KEY = "sgtb-records-auth-intent";
@@ -69,6 +70,8 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
   );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [accountName, setAccountName] = useState("");
+  const [authMode, setAuthMode] = useState<"signin" | "register">("signin");
   const [notice, setNotice] = useState<string | null>(null);
   const [mediaError, setMediaError] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
@@ -76,6 +79,30 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
   const [activeClip, setActiveClip] = useState<IntroClip | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const utils = trpc.useUtils();
+  const loginMutation = trpc.auth.login.useMutation({
+    onSuccess: async (result) => {
+      if (!result.success && result.requiresVerification) {
+        writeSession(INTRO_SEEN_KEY, "true");
+        setVisible(false);
+        navigate("/verify-email?sent=1");
+        return;
+      }
+      await utils.auth.me.invalidate();
+      setNotice(result.message);
+    },
+    onError: (error) => setNotice(error.message),
+  });
+  const registerMutation = trpc.auth.register.useMutation({
+    onSuccess: (result) => {
+      writeSession(INTRO_SEEN_KEY, "true");
+      setVisible(false);
+      navigate("/verify-email?sent=1");
+      setNotice(result.message);
+    },
+    onError: (error) => setNotice(error.message),
+  });
 
   const showVideo = phase === "intro";
   const currentClip = activeClip;
@@ -195,13 +222,21 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
   function submitStandardLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!email.trim() || !password.trim()) {
-      setNotice("Enter an email and password to continue to secure sign-in.");
+      setNotice("Enter an email and password to continue.");
       return;
     }
     setNotice(null);
     setAuthIntent("standard");
     writeSession(AUTH_INTENT_KEY, "standard");
-    startLogin();
+    if (authMode === "register") {
+      if (!accountName.trim()) {
+        setNotice("Enter a display name to create your account.");
+        return;
+      }
+      registerMutation.mutate({ email: email.trim(), password, name: accountName.trim() });
+    } else {
+      loginMutation.mutate({ email: email.trim(), password });
+    }
   }
 
   function continueWithGoogle() {
@@ -351,7 +386,7 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
                       <LockKeyhole className="size-3.5" />
                       {phaseLabel}
                     </div>
-                    <h3 className="mt-3 font-display text-5xl uppercase leading-none text-white">Sign in</h3>
+                    <h3 className="mt-3 font-display text-5xl uppercase leading-none text-white">{authMode === "register" ? "Create account" : "Sign in"}</h3>
                   </div>
                   <div className="hidden size-12 items-center justify-center rounded-full border border-gold/25 bg-gold/5 text-gold sm:flex">
                     <Sparkles className="size-5" />
@@ -359,6 +394,10 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
                 </div>
 
                 <form onSubmit={submitStandardLogin} className="space-y-4">
+                  {authMode === "register" && <div className="space-y-2">
+                    <Label htmlFor="gateway-name" className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Display name</Label>
+                    <Input id="gateway-name" value={accountName} onChange={(event) => setAccountName(event.target.value)} placeholder="Your professional name" autoComplete="name" className="h-12 border-white/12 bg-black/20 text-white placeholder:text-muted-foreground/60" />
+                  </div>}
                   <div className="space-y-2">
                     <Label htmlFor="gateway-email" className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Email</Label>
                     <Input
@@ -379,18 +418,22 @@ export default function AccessGateway({ children }: AccessGatewayProps) {
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
                       placeholder="••••••••••••"
-                      autoComplete="current-password"
+                      autoComplete={authMode === "register" ? "new-password" : "current-password"}
                       className="h-12 border-white/12 bg-black/20 text-white placeholder:text-muted-foreground/60"
                     />
                   </div>
-                  <Button type="submit" className="h-12 w-full bg-gold font-display text-xl uppercase tracking-[0.08em] text-[#17120a] hover:bg-gold-soft">
-                    Continue to secure sign-in <ArrowRight className="ml-2 size-4" />
+                  <Button type="submit" disabled={loginMutation.isPending || registerMutation.isPending} className="h-12 w-full bg-gold font-display text-xl uppercase tracking-[0.08em] text-[#17120a] hover:bg-gold-soft">
+                    {(loginMutation.isPending || registerMutation.isPending) ? <Loader2 className="mr-2 size-4 animate-spin" /> : <ArrowRight className="mr-2 size-4" />}
+                    {authMode === "register" ? "Create account" : "Sign in"}
                   </Button>
                 </form>
 
                 <p className="mt-4 text-center text-[10px] leading-5 text-muted-foreground">
-                  This terminal currently hands off to the existing Manus OAuth sign-in flow. The email and password fields are present for the VIP-tier interface but are not stored or checked locally.
+                  {authMode === "register" ? "New email accounts must confirm their address before access is enabled." : "Use your confirmed email account, or continue with the secure OAuth provider below."}
                 </p>
+                <button type="button" onClick={() => { setAuthMode(authMode === "register" ? "signin" : "register"); setNotice(null); }} className="mx-auto block text-center font-mono text-[10px] uppercase tracking-[0.16em] text-gold-soft underline decoration-gold/30 underline-offset-4 hover:text-gold">
+                  {authMode === "register" ? "Already have an account? Sign in" : "New here? Create an account"}
+                </button>
 
                 <div className="my-6 flex items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                   <span className="h-px flex-1 bg-white/10" />
