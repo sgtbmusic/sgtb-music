@@ -224,9 +224,37 @@ Do not add unverified credentials or claim a client-side Rosie button is cryptog
 - [x] Validate TypeScript, production build, 31 Vitest tests, and responsive authenticated UI flows
 
 ## Password Recovery, Leaderboard Playback, & Bulk Moderation (Aug 2026)
-- [ ] Add password-reset token schema and secure request/reset tRPC procedures
-- [ ] Build professional Forgot Password and Reset Password recovery pages
-- [ ] Add direct audio playback controls and submission-date sorting to the home page playlist leaderboard
-- [ ] Add bulk selection and bulk approve/deny actions to the admin moderation dashboard
-- [ ] Run type checks, Vitest tests, and save checkpoint
+- [x] Add password-reset token schema and secure request/reset tRPC procedures
+- [x] Build professional Forgot Password and Reset Password recovery pages
+- [x] Add direct audio playback controls and submission-date sorting to the home page playlist leaderboard
+- [x] Add bulk selection and bulk approve/deny actions to the admin moderation dashboard
+- [x] Run type checks, Vitest tests, and save checkpoint
 - [x] Add a visible Forgot Password link to the AccessGateway sign-in terminal
+## Platform Architecture & Brand Audit (Aug 2026)
+- [x] Phase 1: Define audit scope and record review criteria
+- [x] Phase 2: Inspect current routes, source files, and preview health
+- [x] Phase 3: Review attached hip-hop photography assets and design system fit
+- [x] Phase 4: Audit operational workflows (Auth, Global Audio, Inbox, Moderation, Rewards)
+- [x] Phase 5: Deliver straight-forward, unvarnished executive audit report
+## Production Hardening & Unification Pass (Aug 2026)
+- [x] Phase 1: Audit current player, Suno HQ, visual tokens, and deployment state
+- [ ] Phase 2: Implement gritty-luxury design tokens (`index.css`) and upgrade hero/card aesthetics
+- [ ] Phase 3: Unify global audio playback so all triggers (Home leaderboard, Music page, Social feed) share a single persistent controller without overlapping audio streams
+- [ ] Phase 4: Reposition the master showcase player to the absolute top fold of `/suno-hq`, and fix mobile typography / overflow across all viewports
+- [ ] Phase 5: Streamline verified-user onboarding and test full build & unit test suite
+- [ ] Phase 6: Verify live domain build cache status and document any external CDN propagation requirements
+## Visual Asset Library & Gritty Luxury Integration (Aug 2026)
+- [x] Phase 1: Inventory uploaded image references in `/home/ubuntu/upload/`
+- [ ] Phase 2: Select and upload key hip-hop editorial/gaming graphic assets to S3 managed storage
+- [ ] Phase 3: Create reusable visual treatment components (GrittyLuxuryHero, CoverArtPlaceholder, EditorialCard)
+- [ ] Phase 4: Integrate visual assets across Home hero, Music catalog placeholders, Suno Business roster, and Executive HQ
+- [ ] Phase 5: Verify visual fidelity, responsive layout, build, and test suite
+- [ ] Phase 6: Deliver integrated visual asset system and confirm storage locations
+## Gritty Luxury Visual Library + Single Player Pass (Aug 2026)
+- [x] Inventory and upload all 39 usable uploaded hip-hop reference images to managed web storage
+- [ ] Build a reusable visual asset registry and curated Visual DNA gallery
+- [ ] Apply gritty-luxury visual tokens, grain, vignette, chrome, and amber treatments to shared surfaces
+- [ ] Use the uploaded references for hero backgrounds, catalog cover fallbacks, roster/EPK art, and executive portal surfaces
+- [ ] Remove page-local audio elements from Music, Executive HQ, and Suno podcast modules
+- [ ] Route every play action through the single persistent audio player
+- [ ] Verify mobile layouts, audio handoff behavior, build, tests, and live asset loading

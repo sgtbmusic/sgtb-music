@@ -1,99 +1,30 @@
-import { useEffect, useRef, useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { formatTime, coverTemplate } from "@/lib/site";
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Disc3, Music2 } from "lucide-react";
+import { coverTemplate, formatTime } from "@/lib/site";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { Disc3, Music2, Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-import { cn } from "@/lib/utils";
 
-type PlayerTrack = {
-  id: number;
-  title: string;
-  artist?: string | null;
-  audioUrl: string;
-  coverUrl?: string | null;
-  coverVariant?: number | null;
-  durationSeconds?: number | null;
-};
-
-export function requestTrackPlayback(track: PlayerTrack) {
-  if (typeof window === "undefined") return;
-  window.dispatchEvent(new CustomEvent<PlayerTrack>("sgtb:play-track", { detail: track }));
-}
+export { requestTrackPlayback } from "@/contexts/AudioPlayerContext";
+export type { PlayerTrack } from "@/contexts/AudioPlayerContext";
 
 export function PersistentAudioPlayer() {
-  const { data: tracks = [] } = trpc.tracks.list.useQuery();
-  const [externalTrack, setExternalTrack] = useState<PlayerTrack | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.85);
-  const [muted, setMuted] = useState(false);
-
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const playlist = externalTrack ? [externalTrack, ...tracks.filter((track) => track.id !== externalTrack.id)] : tracks;
-  const current = playlist[currentIndex] ?? null;
-
-  useEffect(() => {
-    const handleTrackRequest = (event: Event) => {
-      const requestedTrack = (event as CustomEvent<PlayerTrack>).detail;
-      if (!requestedTrack?.audioUrl) return;
-      setExternalTrack(requestedTrack);
-      setCurrentIndex(0);
-      setPlaying(true);
-    };
-    window.addEventListener("sgtb:play-track", handleTrackRequest);
-    return () => window.removeEventListener("sgtb:play-track", handleTrackRequest);
-  }, []);
-
-  useEffect(() => {
-    const el = audioRef.current;
-    if (!el || !current) return;
-    if (el.dataset.trackId !== String(current.id)) {
-      el.dataset.trackId = String(current.id);
-      el.src = current.audioUrl;
-      setCurrentTime(0);
-      setDuration(current.durationSeconds || 180);
-      if (playing) {
-        el.play().catch(() => setPlaying(false));
-      }
-    }
-  }, [current, playing]);
-
-  useEffect(() => {
-    const el = audioRef.current;
-    if (!el) return;
-    el.volume = muted ? 0 : volume;
-  }, [volume, muted]);
-
-  const togglePlay = () => {
-    const el = audioRef.current;
-    if (!el || !current) return;
-    if (el.paused) {
-      el.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
-    } else {
-      el.pause();
-      setPlaying(false);
-    }
-  };
-
-  const handleNext = () => {
-    if (playlist.length === 0) return;
-    const next = (currentIndex + 1) % playlist.length;
-    setCurrentIndex(next);
-    setPlaying(true);
-  };
-
-  const handlePrev = () => {
-    if (playlist.length === 0) return;
-    const prev = (currentIndex - 1 + playlist.length) % playlist.length;
-    setCurrentIndex(prev);
-    setPlaying(true);
-  };
+  const {
+    current,
+    currentTime,
+    duration,
+    isPlaying,
+    volume,
+    muted,
+    togglePlay,
+    next,
+    previous,
+    seek,
+    setVolume,
+    toggleMute,
+  } = useAudioPlayer();
 
   if (!current) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gold/25 bg-[#0d0a06]/95 px-4 py-3 text-foreground shadow-[0_-10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gold/25 bg-[#0d0a06]/95 px-3 py-2.5 text-foreground shadow-[0_-10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:px-4 sm:py-3">
         <div className="container mx-auto flex max-w-7xl items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <div className="grid size-10 shrink-0 place-items-center rounded-xl border border-gold/30 bg-gold/5 text-gold"><Music2 className="size-5" /></div>
@@ -105,118 +36,52 @@ export function PersistentAudioPlayer() {
     );
   }
 
-  const template = coverTemplate(current.id);
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const template = coverTemplate(Number(current.id) || 0);
+  const safeDuration = duration > 0 ? duration : 180;
+  const progress = safeDuration > 0 ? Math.min(100, Math.max(0, (currentTime / safeDuration) * 100)) : 0;
 
   return (
-    <>
-      <audio
-        ref={audioRef}
-        onTimeUpdate={() => audioRef.current && setCurrentTime(audioRef.current.currentTime)}
-        onLoadedMetadata={() => audioRef.current && setDuration(audioRef.current.duration || 180)}
-        onEnded={handleNext}
-      />
-
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d0a06]/95 backdrop-blur-xl border-t border-gold/25 px-4 py-3 shadow-[0_-10px_30px_rgba(0,0,0,0.8)] text-foreground">
-        <div className="container max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          
-          {/* Left: Track Info */}
-          <div className="flex items-center gap-3 w-full sm:w-72 shrink-0">
-            {current.coverUrl ? (
-              <img src={current.coverUrl} alt={current.title} className="size-12 rounded-xl object-cover border border-gold/30 shrink-0" />
-            ) : (
-              <div
-                className="size-12 rounded-xl flex items-center justify-center border border-gold/30 shrink-0 shadow-inner"
-                style={{ background: `linear-gradient(135deg, ${template.from}, ${template.to})` }}
-              >
-                <Disc3 className="size-6 text-gold animate-spin-slow" />
-              </div>
-            )}
-            <div className="min-w-0">
-              <p className="font-display text-sm uppercase text-white truncate tracking-wider">{current.title}</p>
-              <p className="font-mono text-[11px] uppercase text-gold truncate">{current.artist || "SGTB Music Group"}</p>
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gold/25 bg-[#0d0a06]/95 px-3 py-2.5 text-foreground shadow-[0_-10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:px-4 sm:py-3">
+      <div className="container mx-auto flex max-w-7xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+        <div className="flex w-full min-w-0 items-center gap-3 sm:w-72 sm:shrink-0">
+          {current.coverUrl ? (
+            <img src={current.coverUrl} alt={`${current.title} cover art`} className="size-10 shrink-0 rounded-xl border border-gold/30 object-cover sm:size-12" />
+          ) : (
+            <div className="grid size-10 shrink-0 place-items-center rounded-xl border border-gold/30 shadow-inner sm:size-12" style={{ background: `linear-gradient(135deg, ${template.from}, ${template.to})` }}>
+              <Disc3 className={`size-5 text-gold sm:size-6 ${isPlaying ? "anim-spin-slow" : ""}`} />
             </div>
+          )}
+          <div className="min-w-0">
+            <p className="truncate font-display text-sm uppercase tracking-wider text-white">{current.title}</p>
+            <p className="truncate font-mono text-[10px] uppercase text-gold sm:text-[11px]">{current.artist || (current.kind === "podcast" ? "Suno Business Broadcast" : "SGTB Music Group")}</p>
           </div>
+          <span className="ml-auto shrink-0 rounded-full border border-neon/20 bg-neon/5 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-neon sm:hidden">{isPlaying ? "Live" : "Ready"}</span>
+        </div>
 
-          {/* Center: Controls & Scrubber */}
-          <div className="flex-1 max-w-2xl w-full flex flex-col items-center gap-1.5 px-2">
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={handlePrev}
-                className="text-muted-foreground hover:text-gold transition-colors"
-                aria-label="Previous track"
-              >
-                <SkipBack className="size-4" />
-              </button>
-              <button
-                type="button"
-                onClick={togglePlay}
-                className="size-9 rounded-full bg-gold text-[#17120a] hover:bg-gold-soft flex items-center justify-center transition-transform hover:scale-105 shadow-[0_0_15px_rgba(212,175,55,0.4)]"
-                aria-label={playing ? "Pause" : "Play"}
-              >
-                {playing ? <Pause className="size-4 fill-current" /> : <Play className="size-4 fill-current ml-0.5" />}
-              </button>
-              <button
-                type="button"
-                onClick={handleNext}
-                className="text-muted-foreground hover:text-gold transition-colors"
-                aria-label="Next track"
-              >
-                <SkipForward className="size-4" />
-              </button>
-            </div>
-
-            <div className="w-full flex items-center gap-3 font-mono text-[10px] text-muted-foreground">
-              <span>{formatTime(currentTime)}</span>
-              <div className="relative flex-1 h-1.5 bg-white/10 rounded-full cursor-pointer group overflow-hidden">
-                <div
-                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-neon via-gold to-gold rounded-full transition-all"
-                  style={{ width: `${progress}%` }}
-                />
-                <input
-                  type="range"
-                  min={0}
-                  max={duration || 100}
-                  value={currentTime}
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    if (audioRef.current) audioRef.current.currentTime = val;
-                    setCurrentTime(val);
-                  }}
-                  className="absolute inset-0 opacity-0 cursor-pointer w-full"
-                />
-              </div>
-              <span>{formatTime(duration)}</span>
-            </div>
-          </div>
-
-          {/* Right: Volume & Status */}
-          <div className="hidden sm:flex items-center gap-3 w-64 justify-end shrink-0">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-neon flex items-center gap-1">
-              <span className="size-1.5 rounded-full bg-neon animate-pulse" /> Master Feed
-            </span>
-            <button
-              type="button"
-              onClick={() => setMuted(!muted)}
-              className="text-muted-foreground hover:text-white transition-colors"
-            >
-              {muted || volume === 0 ? <VolumeX className="size-4 text-red-400" /> : <Volume2 className="size-4" />}
+        <div className="flex w-full min-w-0 flex-1 flex-col items-center gap-1 px-0 sm:max-w-2xl sm:px-2">
+          <div className="flex items-center gap-4">
+            <button type="button" onClick={previous} className="text-muted-foreground transition-colors hover:text-gold" aria-label="Previous track"><SkipBack className="size-4" /></button>
+            <button type="button" onClick={togglePlay} className="grid size-9 place-items-center rounded-full bg-gold text-[#17120a] shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-transform hover:scale-105 hover:bg-gold-soft" aria-label={isPlaying ? "Pause" : "Play"}>
+              {isPlaying ? <Pause className="size-4 fill-current" /> : <Play className="ml-0.5 size-4 fill-current" />}
             </button>
-            <Slider
-              value={[muted ? 0 : volume * 100]}
-              max={100}
-              step={1}
-              onValueChange={(val) => {
-                setVolume(val[0] / 100);
-                if (muted) setMuted(false);
-              }}
-              className="w-24 accent-gold"
-            />
+            <button type="button" onClick={next} className="text-muted-foreground transition-colors hover:text-gold" aria-label="Next track"><SkipForward className="size-4" /></button>
           </div>
+          <div className="flex w-full items-center gap-2 font-mono text-[10px] text-muted-foreground sm:gap-3">
+            <span className="w-8 text-right">{formatTime(currentTime)}</span>
+            <div className="group relative h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-white/10">
+              <div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-neon via-gold to-gold" style={{ width: `${progress}%` }} />
+              <input type="range" min={0} max={safeDuration} step={0.1} value={Math.min(currentTime, safeDuration)} onChange={event => seek(Number(event.target.value))} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" aria-label="Seek in track" />
+            </div>
+            <span className="w-8">{formatTime(safeDuration)}</span>
+          </div>
+        </div>
 
+        <div className="hidden w-64 shrink-0 items-center justify-end gap-3 sm:flex">
+          <span className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-neon"><span className="size-1.5 animate-pulse rounded-full bg-neon" /> Master Feed</span>
+          <button type="button" onClick={toggleMute} className="text-muted-foreground transition-colors hover:text-white" aria-label={muted ? "Unmute" : "Mute"}>{muted || volume === 0 ? <VolumeX className="size-4 text-red-400" /> : <Volume2 className="size-4" />}</button>
+          <Slider value={[muted ? 0 : Math.round(volume * 100)]} max={100} step={1} onValueChange={value => setVolume((value[0] ?? 0) / 100)} className="w-24" aria-label="Volume" />
         </div>
       </div>
-    </>
+    </div>
   );
 }

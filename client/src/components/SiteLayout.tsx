@@ -4,6 +4,7 @@ import { OnboardingGuide } from "@/components/OnboardingGuide";
 import { useScrollTop } from "@/hooks/useScrollTop";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
+import { CURATED_HERO_ASSET } from "@/lib/visualAssets";
 
 type SiteLayoutProps = {
   children: ReactNode;
@@ -22,6 +23,8 @@ export function SiteLayout({ children, variant = "default" }: SiteLayoutProps) {
       )}>
       {variant === "default" && (
         <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+          <img src={CURATED_HERO_ASSET.src} alt="" className="absolute inset-0 size-full object-cover opacity-[0.045] grayscale" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(212,175,55,0.08),transparent_42%)]" />
           <div className="grid-texture absolute inset-0 opacity-60" />
           <div className="absolute -top-32 -left-24 size-[36rem] rounded-full bg-gold/6 blur-[120px]" />
           <div className="absolute top-1/3 -right-32 size-[32rem] rounded-full bg-neon/6 blur-[130px]" />

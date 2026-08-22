@@ -1,4 +1,4 @@
-import { coverTemplate } from "@/lib/site";
+import { CURATED_COVER_ASSETS } from "@/lib/visualAssets";
 import { cn } from "@/lib/utils";
 
 type CoverArtProps = {
@@ -11,27 +11,16 @@ type CoverArtProps = {
 };
 
 /**
- * Renders uploaded artwork when present, otherwise a generated template cover
- * that keeps the catalog looking intentional before real art exists.
+ * Renders uploaded artwork when present. If artwork is still pending, use a
+ * managed Visual DNA reference as an intentional editorial placeholder so a
+ * catalog row never feels unfinished.
  */
-export function CoverArt({
-  title,
-  coverUrl,
-  variant = 0,
-  className,
-  size = "md",
-}: CoverArtProps) {
+export function CoverArt({ title, coverUrl, variant = 0, className, size = "md" }: CoverArtProps) {
   if (coverUrl) {
-    return (
-      <img
-        src={coverUrl}
-        alt={`${title} cover art`}
-        className={cn("size-full object-cover", className)}
-      />
-    );
+    return <img src={coverUrl} alt={`${title} cover art`} className={cn("size-full object-cover", className)} />;
   }
 
-  const template = coverTemplate(variant);
+  const asset = CURATED_COVER_ASSETS[Math.abs(variant) % CURATED_COVER_ASSETS.length];
   const initials = title
     .split(/\s+/)
     .filter(Boolean)
@@ -40,77 +29,28 @@ export function CoverArt({
     .join("");
 
   return (
-    <div
-      className={cn("relative size-full overflow-hidden", className)}
-      style={{
-        backgroundImage: `linear-gradient(145deg, ${template.from}, ${template.to})`,
-      }}
-      role="img"
-      aria-label={`${title} placeholder cover art`}>
-      {/* Concentric groove rings */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-40"
-        style={{
-          backgroundImage: `repeating-radial-gradient(circle at 68% 30%, ${template.accent}22 0 1px, transparent 1px 9px)`,
-        }}
-      />
-      {/* Diagonal hairlines */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-25"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(115deg, oklch(1 0 0 / 8%) 0 1px, transparent 1px 14px)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background: `radial-gradient(circle at 20% 85%, ${template.accent}26, transparent 60%)`,
-        }}
-      />
+    <div className={cn("editorial-frame size-full", className)} role="img" aria-label={`${title} editorial placeholder cover art`}>
+      <img src={asset.src} alt="" aria-hidden className="sgtb-image-hover absolute inset-0 size-full object-cover opacity-65 saturate-[0.82]" />
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(7,6,5,0.2),rgba(7,6,5,0.9)),linear-gradient(0deg,rgba(212,175,55,0.2),transparent_42%)]" />
+      <div className="noise-texture pointer-events-none absolute inset-0 opacity-20" />
+      <div className="gold-specular pointer-events-none absolute inset-0 opacity-60" />
 
       {size === "sm" ? (
-        <div className="absolute inset-0 grid place-items-center">
-          <span
-            className="font-display text-lg leading-none"
-            style={{ color: template.accent }}>
-            {initials || "SG"}
-          </span>
+        <div className="relative grid size-full place-items-center">
+          <span className="font-display text-2xl leading-none text-gold-soft drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">{initials || "SG"}</span>
         </div>
       ) : (
-        <div className="absolute inset-0 flex flex-col justify-between p-4">
-          <div className="flex items-start justify-between">
-            <span
-              className="font-mono text-[0.55rem] tracking-[0.28em] uppercase opacity-80"
-              style={{ color: template.accent }}>
-              SGTB
-            </span>
-            <span className="font-mono text-[0.55rem] tracking-[0.2em] text-white/45 uppercase">
-              Master
-            </span>
+        <div className="relative flex size-full flex-col justify-between p-4">
+          <div className="flex items-start justify-between gap-3">
+            <span className="font-mono text-[0.55rem] uppercase tracking-[0.28em] text-gold-soft">SGTB</span>
+            <span className="font-mono text-[0.55rem] uppercase tracking-[0.2em] text-white/65">Visual DNA</span>
           </div>
-
           <div>
-            <span
-              className="font-display block text-3xl leading-none uppercase sm:text-4xl"
-              style={{ color: template.accent }}>
-              {initials || "SG"}
-            </span>
-            <span className="font-condensed mt-1.5 block line-clamp-2 text-xs tracking-[0.14em] text-white/70 uppercase">
-              {title}
-            </span>
+            <span className="font-display block text-3xl uppercase leading-none text-gold-soft drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] sm:text-4xl">{initials || "SG"}</span>
+            <span className="font-condensed mt-1.5 block line-clamp-2 text-xs uppercase tracking-[0.14em] text-white/85">{title}</span>
           </div>
         </div>
       )}
-
-      {/* Sheen */}
-      <div
-        aria-hidden
-        className="absolute -top-1/2 left-0 h-[200%] w-1/3 rotate-12 bg-white/6 blur-2xl"
-      />
     </div>
   );
 }

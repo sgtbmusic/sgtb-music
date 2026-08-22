@@ -6,24 +6,27 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ShieldCheck, Music2, AlertCircle } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useLocation } from "wouter";
 
 export function FirstTimeOnboardingModal() {
   const { user, refresh } = useAuth();
+  const [, setLocation] = useLocation();
   const [sunoHandle, setSunoHandle] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [error, setError] = useState("");
 
   const updateProfile = trpc.profile.update.useMutation({
-    onSuccess: () => {
-      refresh();
+    onSuccess: async () => {
+      await refresh();
+      setLocation("/upload");
     },
     onError: (err) => {
       setError(err.message || "Failed to complete onboarding.");
     },
   });
 
-  if (!user) return null;
+  if (!user || user.emailVerified === 0) return null;
 
   // Show if user hasn't accepted agreement or hasn't set sunoHandle
   const needsOnboarding = !user.agreementAcceptedAt || !user.sunoHandle;

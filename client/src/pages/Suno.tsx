@@ -4,12 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useState } from "react";
-import { Sparkles, Users, Settings, ArrowUpRight } from "lucide-react";
+import { Sparkles, Settings, ArrowUpRight } from "lucide-react";
 import { CredentialPopups } from "@/components/suno/CredentialPopups";
 import { CreatorProfileDialog } from "@/components/suno/CreatorProfileDialog";
 import { CreatorEditorDialog } from "@/components/suno/CreatorEditorDialog";
 import { SunoPodcastSection } from "@/components/suno/SunoPodcastSection";
 import type { Creator } from "@shared/types";
+import { CURATED_HERO_ASSET, CURATED_ROSTER_ASSETS } from "@/lib/visualAssets";
 
 export default function Suno() {
   const { user } = useAuth();
@@ -49,7 +50,7 @@ export default function Suno() {
     <SiteLayout>
       <div className="container max-w-7xl py-12 sm:py-20">
         {/* Header with Admin Settings Icon */}
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between border-b border-white/10 pb-12">
+        <div className="grit-surface relative flex flex-col gap-6 rounded-[2rem] border-b border-white/10 p-6 pb-10 sm:p-10 lg:flex-row lg:items-end lg:justify-between lg:p-12" style={{ backgroundImage: `linear-gradient(90deg, rgba(8,7,6,0.96), rgba(8,7,6,0.78) 56%, rgba(8,7,6,0.52)), url(${CURATED_HERO_ASSET.src})`, backgroundPosition: "center", backgroundSize: "cover" }}>
           <div>
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="border-gold/40 bg-gold/10 font-mono text-xs uppercase tracking-[0.26em] text-gold">
@@ -196,7 +197,7 @@ export default function Suno() {
                       {creator.imageUrl ? (
                         <img src={creator.imageUrl} alt={creator.name} className="size-full object-cover" />
                       ) : (
-                        <Users className="size-6 text-gold" />
+                        <img src={CURATED_ROSTER_ASSETS[creator.id % CURATED_ROSTER_ASSETS.length]?.src} alt="Editorial roster placeholder" className="size-full object-cover saturate-[0.85]" />
                       )}
                     </div>
                     <Badge variant="outline" className="border-gold/20 bg-white/5 font-mono text-[10px] text-gold uppercase">

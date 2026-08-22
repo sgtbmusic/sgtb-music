@@ -5,6 +5,7 @@ import NotFound from "@/pages/NotFound";
 import { Redirect, Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { AudioPlayerProvider } from "./contexts/AudioPlayerContext";
 import AccessGateway from "./components/AccessGateway";
 import ArtistDraftPool from "./pages/ArtistDraftPool";
 import About from "./pages/About";
@@ -76,14 +77,16 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
-          <Toaster />
-          <AccessGateway>
-            <VerificationGate>
-              <Router />
-            </VerificationGate>
-            <PersistentAudioPlayer />
-            <FirstTimeOnboardingModal />
-          </AccessGateway>
+          <AudioPlayerProvider>
+            <Toaster />
+            <AccessGateway>
+              <VerificationGate>
+                <Router />
+              </VerificationGate>
+              <PersistentAudioPlayer />
+              <FirstTimeOnboardingModal />
+            </AccessGateway>
+          </AudioPlayerProvider>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

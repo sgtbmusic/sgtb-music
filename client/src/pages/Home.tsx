@@ -8,6 +8,7 @@ import { ArrowDownUp, ArrowUpRight, CalendarDays, Play, ShieldCheck, Sparkles, T
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { requestTrackPlayback } from "@/components/PersistentAudioPlayer";
+import { CURATED_HERO_ASSET } from "@/lib/visualAssets";
 
 type LeaderboardSortMode = "signal" | "newest" | "oldest";
 
@@ -27,6 +28,9 @@ export default function Home() {
     <SiteLayout>
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-white/8 py-20 sm:py-32">
+        <img src={CURATED_HERO_ASSET.src} alt="" aria-hidden className="absolute inset-0 size-full object-cover opacity-20" />
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,7,6,0.98),rgba(8,7,6,0.8)_52%,rgba(8,7,6,0.55)),linear-gradient(0deg,rgba(8,7,6,0.94),transparent_55%)]" />
+        <div aria-hidden className="noise-texture absolute inset-0 opacity-15" />
         <div aria-hidden className="grid-texture absolute inset-0 opacity-25" />
         <div aria-hidden className="absolute -left-32 top-0 size-[32rem] rounded-full bg-gold/10 blur-[140px]" />
         <div aria-hidden className="absolute -right-24 bottom-0 size-[30rem] rounded-full bg-neon/10 blur-[150px]" />
@@ -46,7 +50,7 @@ export default function Home() {
             </p>
 
             {/* Playlist Consideration Banner */}
-            <div className="mt-8 mx-auto max-w-2xl rounded-2xl border border-gold/40 bg-gradient-to-r from-gold/15 via-[#12141a] to-gold/10 p-5 text-left shadow-xl shadow-gold/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="grit-surface mt-8 mx-auto max-w-2xl rounded-2xl p-5 text-left shadow-xl shadow-gold/5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center space-x-3">
                 <div className="p-3 rounded-xl bg-gold/20 text-gold shrink-0">
                   <Music4 className="w-6 h-6" />

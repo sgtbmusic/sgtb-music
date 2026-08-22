@@ -9,6 +9,8 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
 import { cn } from "@/lib/utils";
 import { PreGenerationPipelineSelector } from "@/components/PreGenerationPipelineSelector";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { CURATED_HERO_ASSET } from "@/lib/visualAssets";
 import {
   ShieldCheck,
   Lock,
@@ -24,17 +26,16 @@ import {
   Radio,
   User,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export default function ExecutiveHQ() {
   const { user, isAuthenticated } = useAuth();
   const utils = trpc.useUtils();
   const { data: catalog = [], isLoading } = trpc.executive.listCatalog.useQuery();
+  const audio = useAudioPlayer();
 
   const [activeCategory, setActiveCategory] = useState<string>("All");
-  const [playingId, setPlayingId] = useState<number | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   // Meeting form state
   const [executiveName, setExecutiveName] = useState("");
@@ -43,8 +44,6 @@ export default function ExecutiveHQ() {
   const [requestedDate, setRequestedDate] = useState("");
   const [notes, setNotes] = useState("");
   const [submittingMeeting, setSubmittingMeeting] = useState(false);
-
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const isExecutiveAccess = isAuthenticated && user && (user.role === "admin" || user.role === "rep");
 
@@ -80,62 +79,79 @@ export default function ExecutiveHQ() {
     });
   }
 
-  function togglePlay(id: number, url: string) {
-    if (playingId === id && isPlaying) {
-      audioRef.current?.pause();
-      setIsPlaying(false);
-    } else {
-      setPlayingId(id);
-      setIsPlaying(true);
-      if (audioRef.current) {
-        audioRef.current.src = url;
-        audioRef.current.play().catch(() => setIsPlaying(false));
-      }
-    }
+  function togglePlay(item: (typeof catalog)[number]) {
+    audio.toggleTrack({ ...item, kind: "track" });
   }
 
   const categories = ["All", "Suno Voice Persona", "Hybrid Stems (Pro Tools Mix)", "Live Sync Concepts"];
   const filteredCatalog = activeCategory === "All" ? catalog : catalog.filter(item => item.category === activeCategory);
+  const featuredItem = filteredCatalog[0] ?? catalog[0] ?? null;
+  const featuredIsCurrent = Boolean(featuredItem && audio.isCurrent({ id: featuredItem.id, kind: "track" }));
+  const featuredIsPlaying = featuredIsCurrent && audio.isPlaying;
 
   return (
     <SiteLayout>
       <div className="container max-w-7xl py-12 sm:py-20">
-        {/* Header */}
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between border-b border-white/10 pb-12">
-          <div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="border-gold/40 bg-gold/10 font-mono text-xs uppercase tracking-[0.26em] text-gold">
-                <ShieldCheck className="mr-1.5 size-3.5 text-gold" /> Suno Executive Portal (/suno-hq)
-              </Badge>
-              {isExecutiveAccess && (
-                <Badge variant="outline" className="border-neon/40 bg-neon/10 font-mono text-xs uppercase tracking-wider text-neon">
-                  Verified Executive Access ({user?.role.toUpperCase()})
+        {/* Top-fold hero + featured master player */}
+        <section className="relative overflow-hidden rounded-[2rem] border border-gold/25 bg-[#0f0a07] shadow-[0_28px_100px_rgba(0,0,0,0.45)]">
+          <img src={CURATED_HERO_ASSET.src} alt="SGTB Visual DNA editorial board" className="absolute inset-0 size-full object-cover opacity-35" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,7,7,0.98)_0%,rgba(8,7,7,0.9)_44%,rgba(8,7,7,0.48)_100%),linear-gradient(0deg,rgba(8,7,7,0.92),transparent_45%)]" />
+          <div className="noise-texture pointer-events-none absolute inset-0 opacity-15" />
+          <div className="relative grid gap-8 p-6 sm:p-10 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)] lg:items-end lg:p-12">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="outline" className="border-gold/40 bg-black/40 font-mono text-[10px] uppercase tracking-[0.26em] text-gold-soft backdrop-blur">
+                  <ShieldCheck className="mr-1.5 size-3.5 text-gold" /> Suno Executive Portal
                 </Badge>
+                {isExecutiveAccess && (
+                  <Badge variant="outline" className="border-neon/40 bg-neon/10 font-mono text-[10px] uppercase tracking-wider text-neon">
+                    Verified {user?.role.toUpperCase()} Access
+                  </Badge>
+                )}
+              </div>
+              <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.3em] text-gold">AI A&amp;R Engine / Blueprint Delivery System</p>
+              <h1 className="mt-4 max-w-3xl font-display text-[clamp(3.3rem,8vw,7.25rem)] uppercase leading-[0.82] text-white">
+                Hear the <span className="text-gold-gradient">next release.</span>
+              </h1>
+              <p className="mt-6 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
+                Curated master songs, pristine Pro Tools hybrid stems, voice persona matrices, and commercial proof points prepared for Suno leadership and label partners.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                {!isAuthenticated ? (
+                  <Button type="button" onClick={() => startLogin()} className="h-11 bg-gold px-5 font-mono text-xs uppercase tracking-wider text-[#17120a] hover:bg-gold-soft">
+                    <User className="mr-2 size-4" /> Sign In for Full Access
+                  </Button>
+                ) : (
+                  <span className="inline-flex max-w-full items-center rounded-2xl border border-gold/30 bg-black/40 px-4 py-2.5 font-mono text-xs text-gold backdrop-blur">Logged in as {user?.name || user?.email}</span>
+                )}
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/30 px-4 py-2 font-mono text-[10px] uppercase tracking-wider text-white/65 backdrop-blur"><span className="size-1.5 rounded-full bg-neon shadow-[0_0_12px_#64f7db]" /> Master assets online</span>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-3xl border border-gold/35 bg-[#0b0908]/90 p-5 shadow-[0_0_50px_rgba(212,175,55,0.14)] backdrop-blur-xl sm:p-6">
+              <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <div><p className="font-mono text-[10px] uppercase tracking-[0.22em] text-gold">Top-fold showcase</p><p className="mt-1 text-xs text-white/55">The first thing an executive should hear.</p></div>
+                <span className="rounded-full border border-neon/25 bg-neon/5 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-neon">HQ / 01</span>
+              </div>
+              {featuredItem ? (
+                <div className="pt-5">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/45">{featuredItem.category}</p>
+                  <h2 className="mt-3 line-clamp-2 font-display text-3xl uppercase leading-none text-white sm:text-4xl">{featuredItem.title}</h2>
+                  <p className="mt-2 truncate font-mono text-xs uppercase tracking-wider text-gold">{featuredItem.artist}</p>
+                  <p className="mt-4 line-clamp-3 text-xs leading-6 text-white/60">{featuredItem.description}</p>
+                  <div className="mt-5 flex items-center gap-3 text-[10px] font-mono uppercase tracking-wider text-white/50"><span>{featuredItem.genre}</span><span>•</span><span>{featuredItem.bpm} BPM</span><span className="ml-auto text-neon">{featuredItem.hitPotential}% index</span></div>
+                  <Button type="button" onClick={() => togglePlay(featuredItem)} className={cn("mt-6 h-11 w-full font-mono text-xs uppercase tracking-wider", featuredIsPlaying ? "bg-neon text-black hover:bg-neon/90" : "bg-gold text-[#17120a] hover:bg-gold-soft")}>
+                    {featuredIsPlaying ? <><Pause className="mr-2 size-4" /> Pause Master</> : <><Play className="mr-2 size-4" /> Play Master</>}
+                  </Button>
+                </div>
+              ) : isLoading ? (
+                <div className="py-12 text-center font-mono text-xs uppercase text-white/50">Loading showcase master…</div>
+              ) : (
+                <div className="py-10 text-center"><p className="font-mono text-xs uppercase tracking-[0.16em] text-white/50">No executive master published</p><p className="mt-2 text-xs leading-5 text-white/35">The top-fold player will activate as soon as an authorized admin publishes a curated master.</p></div>
               )}
             </div>
-            <h1 className="mt-4 font-display text-5xl uppercase leading-none text-white sm:text-7xl">
-              Executive Pitch &amp; <span className="text-gold-gradient">Asset Portal.</span>
-            </h1>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-muted-foreground">
-              Curated master songs, pristine Pro Tools hybrid stems, voice persona matrices, and real-time catalog metrics designed exclusively for Suno leadership and label partners.
-            </p>
           </div>
-          <div className="flex shrink-0 gap-3">
-            {!isAuthenticated ? (
-              <Button
-                type="button"
-                onClick={() => startLogin()}
-                className="bg-gold text-[#17120a] hover:bg-gold-soft font-mono text-xs uppercase tracking-wider h-11 px-6"
-              >
-                <User className="mr-2 size-4" /> Sign In for Full Access
-              </Button>
-            ) : (
-              <div className="rounded-2xl border border-gold/30 bg-gold/5 px-4 py-2.5 font-mono text-xs text-gold">
-                Logged in as {user?.name || user?.email}
-              </div>
-            )}
-          </div>
-        </div>
+        </section>
 
         {/* Access Gate Warning if not Admin/Rep (or allow demo preview) */}
         {!isExecutiveAccess && (
@@ -180,19 +196,13 @@ export default function ExecutiveHQ() {
             </div>
           </div>
 
-          <audio
-            ref={audioRef}
-            onEnded={() => setIsPlaying(false)}
-            onPause={() => setIsPlaying(false)}
-            onPlay={() => setIsPlaying(true)}
-          />
-
           {isLoading ? (
             <div className="glass-panel mt-8 rounded-3xl p-12 text-center font-mono text-xs uppercase text-muted-foreground">Loading executive catalog...</div>
           ) : filteredCatalog.length > 0 ? (
             <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredCatalog.map((item) => {
-                const isCurrent = playingId === item.id;
+                const isCurrent = audio.isCurrent({ id: item.id, kind: "track" });
+                const itemIsPlaying = isCurrent && audio.isPlaying;
                 return (
                   <div key={item.id} className="glass-panel glow-gold group relative rounded-3xl border border-gold/20 p-6 flex flex-col justify-between transition hover:border-gold/50">
                     <div>
@@ -215,10 +225,10 @@ export default function ExecutiveHQ() {
                     <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-between gap-3">
                       <Button
                         type="button"
-                        onClick={() => togglePlay(item.id, item.audioUrl)}
-                        className={cn("flex-1 font-mono text-xs uppercase tracking-wider", isCurrent && isPlaying ? "bg-neon text-black" : "bg-gold text-[#17120a] hover:bg-gold-soft")}
+                        onClick={() => togglePlay(item)}
+                        className={cn("flex-1 font-mono text-xs uppercase tracking-wider", itemIsPlaying ? "bg-neon text-black" : "bg-gold text-[#17120a] hover:bg-gold-soft")}
                       >
-                        {isCurrent && isPlaying ? <><Pause className="mr-2 size-4" /> Pause Master</> : <><Play className="mr-2 size-4" /> Play Master</>}
+                        {itemIsPlaying ? <><Pause className="mr-2 size-4" /> Pause Master</> : <><Play className="mr-2 size-4" /> Play Master</>}
                       </Button>
 
                       {item.stemPackageUrl && (

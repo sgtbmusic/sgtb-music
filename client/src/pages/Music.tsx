@@ -21,70 +21,40 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 
 export default function Music() {
   const { isOwner } = useOwner();
   const { data: tracks, isLoading } = trpc.tracks.list.useQuery();
-
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.85);
-  const [muted, setMuted] = useState(false);
+  const audio = useAudioPlayer();
   const [adminOpen, setAdminOpen] = useState(false);
 
   const list = useMemo(() => tracks ?? [], [tracks]);
-  const current = list[currentIndex] ?? null;
+  const matchedIndex = list.findIndex(track => audio.isCurrent({ id: track.id, kind: "track" }));
+  const currentIndex = matchedIndex >= 0 ? matchedIndex : 0;
+  const current = audio.current ?? list[currentIndex] ?? null;
+  const isCurrentGlobalTrack = Boolean(current && audio.isCurrent(current));
+  const playing = Boolean(isCurrentGlobalTrack && audio.isPlaying);
+  const currentTime = isCurrentGlobalTrack ? audio.currentTime : 0;
+  const duration = isCurrentGlobalTrack ? audio.duration : current?.durationSeconds ?? 0;
 
-  // Keep the audio element in sync with the selected track.
-  useEffect(() => {
-    const element = audioRef.current;
-    if (!element || !current) return;
-    if (element.dataset.trackId === String(current.id)) return;
-    element.dataset.trackId = String(current.id);
-    element.src = current.audioUrl;
-    setCurrentTime(0);
-    setDuration(current.durationSeconds ?? 0);
-    if (playing) {
-      void element.play().catch(() => setPlaying(false));
-    }
-  }, [current, playing]);
+  function goTo(index: number) {
+    if (list.length === 0) return;
+    const nextIndex = (index + list.length) % list.length;
+    const track = list[nextIndex];
+    if (track) audio.playTrack({ ...track, kind: "track" });
+  }
 
-  useEffect(() => {
-    const element = audioRef.current;
-    if (!element) return;
-    element.volume = muted ? 0 : volume;
-  }, [volume, muted]);
-
-  const goTo = useCallback(
-    (index: number) => {
-      if (list.length === 0) return;
-      const next = (index + list.length) % list.length;
-      setCurrentIndex(next);
-      setPlaying(true);
-    },
-    [list.length],
-  );
-
-  const togglePlay = useCallback(() => {
-    const element = audioRef.current;
-    if (!element || !current) return;
-    if (element.paused) {
-      void element.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
-    } else {
-      element.pause();
-      setPlaying(false);
-    }
-  }, [current]);
+  function togglePlay() {
+    if (!current) return;
+    audio.toggleTrack(current);
+  }
 
   function handleSeek(ratio: number) {
-    const element = audioRef.current;
-    if (!element || !Number.isFinite(element.duration)) return;
-    element.currentTime = ratio * element.duration;
-    setCurrentTime(element.currentTime);
+    const nextDuration = isCurrentGlobalTrack ? audio.duration : current?.durationSeconds || 0;
+    if (!Number.isFinite(nextDuration)) return;
+    audio.seek(ratio * nextDuration);
   }
 
   const progress = duration > 0 ? Math.min(1, currentTime / duration) : 0;
@@ -182,8 +152,9 @@ export default function Music() {
                 {/* Controls + playlist */}
                 <div className="flex flex-col">
                   <div className="border-b border-border/60 p-6">
-                    <Waveform
-                      seed={current?.id ?? 1}
+                                          <Waveform
+                      seed={typeof current?.id === "number" ? current.id : 1}
+
                       progress={progress}
                       playing={playing}
                       onSeek={handleSeek}
@@ -227,23 +198,22 @@ export default function Music() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          aria-label={muted ? "Unmute" : "Mute"}
-                          onClick={() => setMuted(value => !value)}>
-                          {muted ? (
+                          aria-label={audio.muted ? "Unmute" : "Mute"}
+                          onClick={audio.toggleMute}>
+                          {audio.muted ? (
                             <VolumeX className="size-4.5" />
                           ) : (
                             <Volume2 className="size-4.5" />
                           )}
                         </Button>
                         <Slider
-                          value={[muted ? 0 : Math.round(volume * 100)]}
+                          value={[audio.muted ? 0 : Math.round(audio.volume * 100)]}
                           max={100}
                           step={1}
                           className="w-28"
                           aria-label="Volume"
                           onValueChange={value => {
-                            setVolume((value[0] ?? 0) / 100);
-                            setMuted((value[0] ?? 0) === 0);
+                            audio.setVolume((value[0] ?? 0) / 100);
                           }}
                         />
                       </div>
@@ -253,7 +223,7 @@ export default function Music() {
                   {/* Playlist */}
                   <ul className="thin-scroll max-h-[22rem] divide-y divide-border/50 overflow-y-auto">
                     {list.map((track, index) => {
-                      const isCurrent = index === currentIndex;
+                      const isCurrent = audio.isCurrent({ id: track.id, kind: "track" });
                       return (
                         <li key={track.id}>
                           <button
@@ -320,19 +290,6 @@ export default function Music() {
           )}
         </div>
 
-        <audio
-          ref={audioRef}
-          preload="metadata"
-          onTimeUpdate={event => setCurrentTime(event.currentTarget.currentTime)}
-          onLoadedMetadata={event => {
-            const value = event.currentTarget.duration;
-            if (Number.isFinite(value)) setDuration(value);
-          }}
-          onPlay={() => setPlaying(true)}
-          onPause={() => setPlaying(false)}
-          onEnded={() => goTo(currentIndex + 1)}
-          className="hidden"
-        />
       </section>
 
       {isOwner && (

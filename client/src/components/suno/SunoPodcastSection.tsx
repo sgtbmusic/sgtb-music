@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { CURATED_COVER_ASSETS } from "@/lib/visualAssets";
 import { Radio, Play, Pause, Plus, Trash2, Mic, Sparkles, Volume2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { fileToBase64 } from "@/lib/fileToBase64";
 import { cn } from "@/lib/utils";
@@ -17,8 +19,7 @@ export function SunoPodcastSection() {
   const utils = trpc.useUtils();
   const { data: episodes = [], isLoading } = trpc.sunoEpisodes.list.useQuery();
 
-  const [activeId, setActiveId] = useState<number | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const audio = useAudioPlayer();
   const [addOpen, setAddOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [host, setHost] = useState("Rosie Nguyen & Guests");
@@ -26,7 +27,6 @@ export function SunoPodcastSection() {
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const isAdmin = user && user.role === "admin";
 
@@ -91,20 +91,20 @@ export function SunoPodcastSection() {
     }
   }
 
-  const activeEpisode = episodes.find((ep) => ep.id === activeId) || episodes[0];
+  const activeEpisode = episodes.find(ep => audio.isCurrent({ id: ep.id, kind: "podcast" })) || episodes[0];
+  const activeIsPlaying = Boolean(activeEpisode && audio.isCurrent({ id: activeEpisode.id, kind: "podcast" }) && audio.isPlaying);
 
-  function togglePlay(id: number, url: string) {
-    if (activeId === id && isPlaying) {
-      audioRef.current?.pause();
-      setIsPlaying(false);
-    } else {
-      setActiveId(id);
-      setIsPlaying(true);
-      if (audioRef.current) {
-        audioRef.current.src = url;
-        audioRef.current.play().catch(() => setIsPlaying(false));
-      }
-    }
+  function togglePlay(episode: (typeof episodes)[number]) {
+    const cover = CURATED_COVER_ASSETS[episode.id % CURATED_COVER_ASSETS.length];
+    audio.toggleTrack({
+      id: episode.id,
+      title: episode.title,
+      artist: episode.host,
+      audioUrl: episode.audioUrl,
+      durationSeconds: episode.durationSeconds,
+      coverUrl: cover?.src,
+      kind: "podcast",
+    });
   }
 
   return (
@@ -163,12 +163,6 @@ export function SunoPodcastSection() {
         )}
       </div>
 
-      <audio
-        ref={audioRef}
-        onEnded={() => setIsPlaying(false)}
-        onPause={() => setIsPlaying(false)}
-        onPlay={() => setIsPlaying(true)}
-      />
 
       {isLoading ? (
         <div className="glass-panel mt-8 rounded-3xl p-8 text-center font-mono text-xs uppercase text-muted-foreground">Loading audio broadcasts...</div>
@@ -199,10 +193,10 @@ export function SunoPodcastSection() {
               {activeEpisode && (
                 <Button
                   type="button"
-                  onClick={() => togglePlay(activeEpisode.id, activeEpisode.audioUrl)}
+                  onClick={() => togglePlay(activeEpisode)}
                   className="size-12 rounded-full bg-gold text-[#17120a] hover:bg-gold-soft p-0 flex items-center justify-center shadow-[0_0_20px_rgba(244,191,55,0.4)]"
                 >
-                  {isPlaying && activeId === activeEpisode.id ? <Pause className="size-5" /> : <Play className="ml-0.5 size-5" />}
+                  {activeIsPlaying ? <Pause className="size-5" /> : <Play className="ml-0.5 size-5" />}
                 </Button>
               )}
             </div>
@@ -211,16 +205,17 @@ export function SunoPodcastSection() {
           {/* Episode playlist */}
           <div className="grid gap-4 lg:col-span-2">
             {episodes.map((ep, idx) => {
-              const isCurrent = activeId === ep.id;
+              const isCurrent = audio.isCurrent({ id: ep.id, kind: "podcast" });
+              const episodeIsPlaying = isCurrent && audio.isPlaying;
               return (
                 <div key={ep.id} className={cn("glass-panel rounded-2xl border p-5 flex items-center justify-between gap-4 transition", isCurrent ? "border-gold/50 bg-gold/5" : "border-white/10 hover:border-white/20")}>
                   <div className="flex items-center gap-4 min-w-0">
                     <button
                       type="button"
-                      onClick={() => togglePlay(ep.id, ep.audioUrl)}
-                      className={cn("grid size-12 shrink-0 place-items-center rounded-xl transition", isCurrent && isPlaying ? "bg-neon text-black" : "bg-gold/10 text-gold hover:bg-gold/20")}
+                      onClick={() => togglePlay(ep)}
+                      className={cn("grid size-12 shrink-0 place-items-center rounded-xl transition", episodeIsPlaying ? "bg-neon text-black" : "bg-gold/10 text-gold hover:bg-gold/20")}
                     >
-                      {isCurrent && isPlaying ? <Pause className="size-5" /> : <Play className="ml-0.5 size-5" />}
+                      {episodeIsPlaying ? <Pause className="size-5" /> : <Play className="ml-0.5 size-5" />}
                     </button>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
